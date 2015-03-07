@@ -146,7 +146,7 @@ function(
   #p-values for each test
   pvals = 1 - pt(abs(teststat), df) + pt(-abs(teststat), df)
   
-  output = list(beta = c(beta1, beta2), df = df, p.value = pvals, 
+  output = list(beta = c(beta1, beta2), teststat = teststat, df = df, p.value = pvals, 
                 s2.epsilon = s2e, s2.gamma = s2g)
   
   return(output)

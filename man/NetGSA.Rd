@@ -1,9 +1,7 @@
 \name{NetGSA}
 \alias{NetGSA}
 \title{Network-based Gene Set Analysis}
-\description{
-Tests the significance of pre-defined sets of genes (pathways) with respect to an outcome variable, such as the condition indicator (e.g. cancer vs. normal, etc.), based on the underlying biological network.
-}
+\description{Tests the significance of pre-defined sets of genes (pathways) with respect to an outcome variable, such as the condition indicator (e.g. cancer vs. normal, etc.), based on the underlying biological network.}
 \usage{
 NetGSA(A1, A2, x, y, B, lklMethod = c("REML", "ML"), directed = FALSE, eta = 0.1,
        lim4kappa = 500)
@@ -38,6 +36,7 @@ In the case of undirected networks, the user can still apply \code{NetGSA} if on
 \value{
 A list with components
 \item{beta}{Vector of fixed effects of length \eqn{2p}, of which the first half is for condition 1 and the second half for conditin 2.}
+\item{teststat}{Test statistics for gene sets (pathways).}
 \item{df}{Degrees of freedom for the test statistics.}
 \item{p.value}{P-values for gene sets (pathways).}
 \item{s2.epsilon}{Variance of the random errors \eqn{\epsilon}.}

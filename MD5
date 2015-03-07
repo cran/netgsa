@@ -1,9 +1,9 @@
-43449d7c26e0c3a0254625ff56e1f551 *DESCRIPTION
+f4c4ae4e6879dee47b9203a708a8d22a *DESCRIPTION
 06aa241689310368c56b6066f963cc3e *NAMESPACE
 aca57e88e4f688f60a0d38a2a6b14de0 *R/NetGSA.R
 1889451c5e77c01370f04b898d187a8b *R/adj2inf.R
 2f4757956f4891756df9c36be1611578 *R/approxVarEst.R
-217032d068a7794f6bbf8217bc8200e8 *R/call.netGSA.R
+998072f3c06d3773e6c353e7607787b2 *R/call.netGSA.R
 c916880314b96003459382b29d98052c *R/covsel.R
 06f545116fae56fc67169436ab94dde2 *R/cv.covsel.R
 3c4bf31b1ad61d392327447b98e2c77e *R/edgelist2adj.R
@@ -17,11 +17,11 @@ efb5969551b7623cbdbd6c988ebd5b35 *R/profile.newton.sg.R
 b2c9235c1ec409a633a4afea28611d01 *data/edgelist.rda
 802c5e542d38e294224ee994921ce5ad *data/netgsaex.rda
 e12b2dcf03c16615f6ae79cafbd0ee2b *data/nonedgelist.rda
-d180dc4cfebf1f508029dbca29c412d9 *man/NetGSA.Rd
+d4d0c5bc865998f5beb7bae6d137fdf7 *man/NetGSA.Rd
 b1dfd6776b21a36122e6c0d4743a946a *man/covsel.Rd
 76f57f9b221b3347236581e99d29fe64 *man/cv.covsel.Rd
 ba04d76769d011f6e9a0bca2c43be927 *man/edgelist.Rd
 a30250a8d0cd11077b8ad1944fc190ab *man/edgelist2adj.Rd
-3225092dd12967b1e2b7ff65577acf35 *man/netgsa-package.Rd
+975caf98877633fa3e987ae5755a3f55 *man/netgsa-package.Rd
 e8c43bc01f5dd112adacc14adf6f97fd *man/netgsaex.Rd
 d0a161e53fedf4bb903eaa4b5d64dc3e *man/nonedgelist.Rd
