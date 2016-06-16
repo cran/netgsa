@@ -8,8 +8,8 @@
 \tabular{ll}{
 Package: \tab netgsa\cr
 Type: \tab Package\cr
-Version: \tab 2.0\cr
-Date: \tab 2015-03-07\cr
+Version: \tab 3.0\cr
+Date: \tab 2016-05-11\cr
 License: \tab GPL (>=2)\cr
 }
 }
@@ -17,9 +17,11 @@ License: \tab GPL (>=2)\cr
 \references{
 Ma, J., Shojaie, A. & Michailidis, G. (2014). Network-based pathway enrichment analysis with incomplete network information, submitted. \url{http://arxiv.org/abs/1411.7919}.
 
-Shojaie, A., & Michailidis, G. (2010). Network enrichment analysis in complex experiments. Statistical applications in genetics and molecular biology, 9(1), Article 22.
+Shojaie, A., & Michailidis, G. (2010a). Penalized likelihood methods for estimation of sparse high-dimensional directed acyclic graphs. Biometrika 97(3), 519-538. \url{http://biomet.oxfordjournals.org/content/97/3/519.short}
 
-Shojaie, A., & Michailidis, G. (2009). Analysis of gene sets based on the underlying regulatory network. Journal of Computational Biology, 16(3), 407-426.
+Shojaie, A., & Michailidis, G. (2010b). Network enrichment analysis in complex experiments. Statistical applications in genetics and molecular biology, 9(1), Article 22. \url{http://www.ncbi.nlm.nih.gov/pubmed/20597848}.
+
+Shojaie, A., & Michailidis, G. (2009). Analysis of gene sets based on the underlying regulatory network. Journal of Computational Biology, 16(3), 407-426. \url{http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3131840/}
 }
 \keyword{ package }
 

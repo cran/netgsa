@@ -29,7 +29,7 @@ Ma, J., Shojaie, A. & Michailidis, G. (2014). Network-based pathway enrichment a
 Ali Shojaie and Jing Ma
 }
 \seealso{
-\code{\link{covsel}}
+\code{\link{netEst.dir}},\code{\link{netEst.undir}}
 }
 \examples{
 #Read the data
@@ -41,6 +41,8 @@ write.table(edgelist, file="edgelist.txt", row.names=FALSE)
 write.table(nonedgelist, file="nonedgelist.txt", row.names=FALSE)
 
 #Read the edge/nonedge list from files
-oneMat = edgelist2adj(file="edgelist.txt", vertex.names=1:50, mode="undirected")
-zeroMat = edgelist2adj(file="nonedgelist.txt", vertex.names=1:50, mode="undirected")
+oneMat = edgelist2adj(file="edgelist.txt", vertex.names=paste0("gene", 1:100), 
+         mode="undirected")
+zeroMat = edgelist2adj(file="nonedgelist.txt", vertex.names=paste0("gene", 1:100), 
+          mode="undirected")
 }

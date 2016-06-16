@@ -1,5 +1,9 @@
 export(NetGSA,
        edgelist2adj,
-       covsel,
-       cv.covsel)
-import(corpcor, cvTools, glmnet, glasso, igraph)
+       netEst.dir,
+       netEst.undir,
+       bic.netEst.undir)
+import(corpcor, Matrix, glmnet, glasso, igraph)
+importFrom("stats", "coef", "cov", "lm", "pf", "pt", "qnorm",
+            "residuals", "sd")
+importFrom("utils", "read.table")
