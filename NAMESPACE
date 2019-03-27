@@ -1,9 +1,18 @@
 export(NetGSA,
-       edgelist2adj,
+       prepareAdjacencyMatrix,
+       preparePathways,
        netEst.dir,
        netEst.undir,
        bic.netEst.undir)
-import(corpcor, Matrix, glmnet, glasso, igraph)
-importFrom("stats", "coef", "cov", "lm", "pf", "pt", "qnorm",
-            "residuals", "sd")
-importFrom("utils", "read.table")
+import(glassoFast, Matrix)
+importFrom("stats", "coef", "cov", "lm", "p.adjust", "pf", "pt", 
+           "qnorm", "residuals", "sd")
+importFrom("utils", "read.csv")
+importFrom("quadprog","solve.QP")
+importFrom("corpcor", "pseudoinverse")
+importFrom("rlang",".data")
+importFrom("magrittr", "%>%")
+importFrom("graph","subGraph")
+importFrom("graph","nodes")
+importFrom("graphite", "pathwayGraph")
+importFrom("graphite", "convertIdentifiers")

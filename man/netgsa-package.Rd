@@ -8,14 +8,14 @@
 \tabular{ll}{
 Package: \tab netgsa\cr
 Type: \tab Package\cr
-Version: \tab 3.0\cr
-Date: \tab 2016-05-11\cr
+Version: \tab 3.1.0\cr
+Date: \tab 2019-03-12\cr
 License: \tab GPL (>=2)\cr
 }
 }
-\author{Ali Shojaie <ashojaie@uw.edu> and Jing Ma <mjing@umich.edu>}
+\author{Ali Shojaie <ashojaie@uw.edu> and Jing Ma <jingma@fredhutch.org>}
 \references{
-Ma, J., Shojaie, A. & Michailidis, G. (2014). Network-based pathway enrichment analysis with incomplete network information, submitted. \url{http://arxiv.org/abs/1411.7919}.
+Ma, J., Shojaie, A. & Michailidis, G. (2016) Network-based pathway enrichment analysis with incomplete network information. Bioinformatics 32(20):165--3174. \url{https://doi.org/10.1093/bioinformatics/btw410}
 
 Shojaie, A., & Michailidis, G. (2010a). Penalized likelihood methods for estimation of sparse high-dimensional directed acyclic graphs. Biometrika 97(3), 519-538. \url{http://biomet.oxfordjournals.org/content/97/3/519.short}
 
@@ -25,7 +25,6 @@ Shojaie, A., & Michailidis, G. (2009). Analysis of gene sets based on the underl
 }
 \keyword{ package }
 
-
 \seealso{
-\code{\link{glasso}, \link{glmnet}}
+\code{\link{glmnet}}
 }

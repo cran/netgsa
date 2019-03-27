@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Jing Ma" />
+
+<meta name="date" content="2019-03-18" />
+
+<title>netgsa: Network-based Gene Set Analysis</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; position: absolute; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource a.sourceLine:empty
+  { position: absolute; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">netgsa: Network-based Gene Set Analysis</h1>
+<h4 class="author">Jing Ma</h4>
+<h4 class="date">2019-03-18</h4>
+
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>In this vignette, we demonstrate the NetGSA workflow using a breast cancer data example downloaded from the Cancer Genome Atlas <span class="citation">(TCGA 2012)</span>. In particular, we illustrate how to incorporate existing network information (e.g. curated edges from KEGG) to improve the power of pathway enrichment analysis with NetGSA. Details of the method are available in <span class="citation">Ma, Shojaie, and Michailidis (2016)</span>.</p>
+</div>
+<div id="case-studies" class="section level1">
+<h1>Case Studies</h1>
+<p>Our example data set comes from a breast cancer study <span class="citation">(TCGA 2012)</span>, which consists of gene expression data from 520 subjects including 117 estrogen-receptor-negative (ER-) and 403 estrogen-receptor-positive (ER+). The goal is to generate a diagnostic pathway signatures that could distinguish patients with different ER statuses by comparing gene expression data from the two classes. These signatures could provide additional clinical benefit in diagnosing breast cancer.</p>
+<div id="preparation" class="section level2">
+<h2>Preparation</h2>
+<p>We first load necessary R/Bioconductor packages. Additional packages such as <strong>msigdbr</strong> are useful if you would like to import pathways from <a href="http://software.broadinstitute.org/gsea/msigdb">MSigDB</a>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(glassoFast)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw">library</span>(graphite)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw">library</span>(igraph)</a>
+<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="kw">library</span>(msigdbr) </a>
+<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="kw">library</span>(netgsa)</a>
+<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="kw">library</span>(Rgraphviz)</a></code></pre></div>
+</div>
+<div id="step-1-loading-rna-seq-data" class="section level2">
+<h2>Step 1: loading RNA-seq data</h2>
+<p>NetGSA works directly with the expression data matrix. When loading the data, it is important to check the distribution of raw sequencing reads and perform log transformation if necessary. Data in this example were already log transformed. It is also important to label the rows and columns of the data matrix. Rows of the data matrix correspond to genes, whereas columns to subjects. Genes in this data matrix were labeled with Entrez IDs, same as those used in KEGG pathways.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">data</span>(breastcancer2012, <span class="dt">package =</span> <span class="st">&quot;netgsa&quot;</span>)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="kw">ls</span>()</a></code></pre></div>
+<pre><code>## [1] &quot;edgelist&quot;    &quot;g&quot;           &quot;group&quot;       &quot;nonedgelist&quot; &quot;pathways&quot;   
+## [6] &quot;x&quot;</code></pre>
+<p>The variables in this data object include</p>
+<ul>
+<li>the data matrix (<code>x</code>), with rows for genes and columns for samples,</li>
+<li>the group labels (<code>group</code>) for ER status,</li>
+<li>a directed acyclic graph from KEGG (<code>g</code>),</li>
+<li>the data frame consisting of known edges (<code>edgelist</code>),</li>
+<li>the data frame consisting of (a subset of) the non-edges (<code>nonedgelist</code>),</li>
+<li>a list of KEGG pathways indexed with Entrez gene IDs (<code>pathways</code>).</li>
+</ul>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">head</span>(<span class="kw">rownames</span>(x))</a></code></pre></div>
+<pre><code>## [1] &quot;127550&quot; &quot;53947&quot;  &quot;65985&quot;  &quot;51166&quot;  &quot;15&quot;     &quot;60496&quot;</code></pre>
+<p>We can find out the ER status by looking at the group labels.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">table</span>(group)</a></code></pre></div>
+<pre><code>## group
+##   1   2 
+## 403 117</code></pre>
+<p>The two data frames <code>nonedgelist</code> and <code>edgelist</code> consist of edges (nonedges) extracted from user provided sources. Each row represents one edge. The first column represents the starting node, with the second column being the end node. The last column indicates whether the edge is directed. As of now, NetGSA assumes that all edges are either simultaneously undirected or simultaneously directed, as determined by the first edge.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw">head</span>(edgelist)</a></code></pre></div>
+<pre><code>##   src  dest  direction
+## 1  15  7534 undirected
+## 2  31 57016 undirected
+## 3  31  5563 undirected
+## 4  60    71 undirected
+## 5  60   867 undirected
+## 6  60  4609 undirected</code></pre>
+</div>
+<div id="step-2-pathway-enrichment-analysis" class="section level2">
+<h2>Step 2: pathway enrichment analysis</h2>
+<div id="enrichment-analysis-with-undirected-networks" class="section level3">
+<h3>Enrichment analysis with undirected networks</h3>
+<p>We consider pathways from KEGG <span class="citation">(Kanehisa and Goto 2000)</span>. KEGG pathways can be accessed in R using the <strong>graphite</strong> package.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">paths &lt;-<span class="st"> </span><span class="kw">pathways</span>(<span class="st">'hsapiens'</span>,<span class="st">'kegg'</span>)</a>
+<a class="sourceLine" id="cb10-2" data-line-number="2">paths[[<span class="dv">1</span>]]</a></code></pre></div>
+<pre><code>## &quot;Glycolysis / Gluconeogenesis&quot; pathway
+## Native ID       = hsa:00010
+## Database        = KEGG
+## Species         = hsapiens
+## Number of nodes = 94
+## Number of edges = 1191
+## Retrieved on    = 18-11-2018
+## URL             = http://www.kegg.jp/kegg-bin/show_pathway?org_name=hsa&amp;mapno=00010</code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw">head</span>(<span class="kw">nodes</span>(paths[[<span class="dv">1</span>]]))</a></code></pre></div>
+<pre><code>## [1] &quot;ENTREZID:10327&quot; &quot;ENTREZID:124&quot;   &quot;ENTREZID:125&quot;   &quot;ENTREZID:126&quot;  
+## [5] &quot;ENTREZID:127&quot;   &quot;ENTREZID:128&quot;</code></pre>
+<p>Alternatively, one can also use the function <code>preparePathways</code> to import pathways from KEGG.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">pathwayList &lt;-<span class="st"> </span><span class="kw">preparePathways</span>(<span class="st">'kegg'</span>)</a>
+<a class="sourceLine" id="cb14-2" data-line-number="2"><span class="kw">head</span>(pathwayList[[<span class="dv">1</span>]])</a></code></pre></div>
+<pre><code>## [1] &quot;10327&quot; &quot;124&quot;   &quot;125&quot;   &quot;126&quot;   &quot;127&quot;   &quot;128&quot;</code></pre>
+<p>Note if one chooses to import pathways from <strong>MSigDB</strong>, genes in the resulting pathways will be labeled using gene symbols. As a result, the data matrix should also use the same set of gene names.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">pathwayList &lt;-<span class="st"> </span><span class="kw">preparePathways</span>(<span class="st">'MSigDB'</span>)</a>
+<a class="sourceLine" id="cb16-2" data-line-number="2"><span class="kw">head</span>(pathwayList[[<span class="dv">1</span>]])</a></code></pre></div>
+<pre><code>## [1] &quot;19&quot;    &quot;11194&quot; &quot;10449&quot; &quot;33&quot;    &quot;34&quot;    &quot;35&quot;</code></pre>
+<p>For the purpose of this tutorial, we use the pathways stored in <code>pathways</code>:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">pathways[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]</a></code></pre></div>
+<pre><code>## $`Adipocytokine signaling pathway`
+##  [1] &quot;10645&quot;  &quot;1147&quot;   &quot;126129&quot; &quot;1374&quot;   &quot;1375&quot;   &quot;2475&quot;   &quot;32&quot;    
+##  [8] &quot;3551&quot;   &quot;3717&quot;   &quot;3952&quot;   &quot;3953&quot;   &quot;4790&quot;   &quot;51094&quot;  &quot;51422&quot; 
+## [15] &quot;53632&quot;  &quot;5465&quot;   &quot;5562&quot;   &quot;5563&quot;   &quot;5564&quot;   &quot;5565&quot;   &quot;5571&quot;  
+## [22] &quot;5588&quot;   &quot;5599&quot;   &quot;5601&quot;   &quot;5602&quot;   &quot;5970&quot;   &quot;6774&quot;   &quot;6794&quot;  
+## [29] &quot;7124&quot;   &quot;7132&quot;   &quot;7133&quot;   &quot;7186&quot;   &quot;79602&quot;  &quot;84254&quot;  &quot;8517&quot;  
+## [36] &quot;8717&quot;   &quot;9021&quot;   &quot;9370&quot;   &quot;3667&quot;   &quot;4792&quot;   &quot;4793&quot;   &quot;4794&quot;  
+## [43] &quot;8471&quot;   &quot;8660&quot;   &quot;2180&quot;   &quot;2181&quot;   &quot;2182&quot;   &quot;23205&quot;  &quot;23305&quot; 
+## [50] &quot;51703&quot;  &quot;81616&quot;  &quot;5781&quot;   &quot;181&quot;    &quot;2538&quot;   &quot;4852&quot;   &quot;5105&quot;  
+## [57] &quot;5106&quot;   &quot;57818&quot;  &quot;6513&quot;   &quot;6517&quot;   &quot;92579&quot;  &quot;10891&quot;  &quot;5443&quot;  
+## 
+## $`Adrenergic signaling in cardiomyocytes`
+##   [1] &quot;10411&quot;  &quot;107&quot;    &quot;108&quot;    &quot;109&quot;    &quot;11069&quot;  &quot;111&quot;    &quot;112&quot;   
+##   [8] &quot;113&quot;    &quot;114&quot;    &quot;115&quot;    &quot;1390&quot;   &quot;146&quot;    &quot;147&quot;    &quot;148&quot;   
+##  [15] &quot;153&quot;    &quot;154&quot;    &quot;163688&quot; &quot;185&quot;    &quot;186&quot;    &quot;196883&quot; &quot;23236&quot; 
+##  [22] &quot;23533&quot;  &quot;2770&quot;   &quot;2771&quot;   &quot;2773&quot;   &quot;2776&quot;   &quot;2778&quot;   &quot;28227&quot; 
+##  [29] &quot;51806&quot;  &quot;5290&quot;   &quot;5291&quot;   &quot;5293&quot;   &quot;5294&quot;   &quot;5295&quot;   &quot;5296&quot;  
+##  [36] &quot;5330&quot;   &quot;5331&quot;   &quot;5332&quot;   &quot;5350&quot;   &quot;5499&quot;   &quot;5500&quot;   &quot;5501&quot;  
+##  [43] &quot;55012&quot;  &quot;5502&quot;   &quot;5515&quot;   &quot;5516&quot;   &quot;5518&quot;   &quot;5519&quot;   &quot;5520&quot;  
+##  [50] &quot;5521&quot;   &quot;5522&quot;   &quot;5523&quot;   &quot;5525&quot;   &quot;5526&quot;   &quot;5527&quot;   &quot;5528&quot;  
+##  [57] &quot;5529&quot;   &quot;5566&quot;   &quot;5567&quot;   &quot;5568&quot;   &quot;5578&quot;   &quot;55844&quot;  &quot;5594&quot;  
+##  [64] &quot;5595&quot;   &quot;70&quot;     &quot;7134&quot;   &quot;7137&quot;   &quot;7139&quot;   &quot;7168&quot;   &quot;7169&quot;  
+##  [71] &quot;7170&quot;   &quot;7171&quot;   &quot;801&quot;    &quot;805&quot;    &quot;808&quot;    &quot;810&quot;    &quot;815&quot;   
+##  [78] &quot;816&quot;    &quot;817&quot;    &quot;818&quot;    &quot;8503&quot;   &quot;91860&quot;  &quot;9252&quot;   &quot;1432&quot;  
+##  [85] &quot;5600&quot;   &quot;5603&quot;   &quot;6300&quot;   &quot;10488&quot;  &quot;1385&quot;   &quot;1386&quot;   &quot;1388&quot;  
+##  [92] &quot;148327&quot; &quot;468&quot;    &quot;596&quot;    &quot;64764&quot;  &quot;84699&quot;  &quot;90993&quot;  &quot;9586&quot;  
+##  [99] &quot;10000&quot;  &quot;207&quot;    &quot;208&quot;    &quot;10368&quot;  &quot;10369&quot;  &quot;27091&quot;  &quot;27092&quot; 
+## [106] &quot;55799&quot;  &quot;59283&quot;  &quot;59284&quot;  &quot;59285&quot;  &quot;6262&quot;   &quot;775&quot;    &quot;776&quot;   
+## [113] &quot;778&quot;    &quot;779&quot;    &quot;781&quot;    &quot;782&quot;    &quot;783&quot;    &quot;784&quot;    &quot;785&quot;   
+## [120] &quot;786&quot;    &quot;9254&quot;   &quot;93589&quot;  &quot;488&quot;    &quot;23439&quot;  &quot;3753&quot;   &quot;3784&quot;  
+## [127] &quot;476&quot;    &quot;477&quot;    &quot;478&quot;    &quot;480&quot;    &quot;481&quot;    &quot;482&quot;    &quot;483&quot;   
+## [134] &quot;486&quot;    &quot;490&quot;    &quot;491&quot;    &quot;492&quot;    &quot;493&quot;    &quot;6324&quot;   &quot;6330&quot;  
+## [141] &quot;6331&quot;   &quot;6332&quot;   &quot;6546&quot;   &quot;6548&quot;   &quot;4624&quot;   &quot;4625&quot;   &quot;4633&quot;  
+## [148] &quot;4634&quot;   &quot;4635&quot;</code></pre>
+<p>To prepare the adjacency matrices needed for the function <code>NetGSA</code>, one can read existing edges from file. For example, suppose the edges in <code>edgelist</code> are stored in a csv file. The function <code>prepareAdjacencyMatrix</code> can input edges from external files or import edges from KEGG data base.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="kw">write.csv</span>(edgelist,<span class="dt">file=</span><span class="st">'edgelist.txt'</span>,<span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb20-2" data-line-number="2">out &lt;-<span class="st"> </span><span class="kw">prepareAdjacencyMatrix</span>(x, group, pathways, <span class="ot">FALSE</span>, <span class="st">'edgelist.txt'</span>, <span class="ot">NULL</span>)</a></code></pre></div>
+<p>The object <code>pathways</code> has in total 100 pathways. To illustrate the use of <code>NetGSA</code>, consider only genes from <em>ErbB signaling pathway</em> and <em>Jak-STAT signaling pathway</em>. Given the pathways, one first estimates the underlying networks (represented as weighted adjacency matrices), while incorporating available network information.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">genenames &lt;-<span class="st"> </span><span class="kw">unique</span>(<span class="kw">c</span>(pathways[[<span class="dv">24</span>]], pathways[[<span class="dv">52</span>]]))</a>
+<a class="sourceLine" id="cb21-2" data-line-number="2">genenames &lt;-<span class="st"> </span><span class="kw">intersect</span>(genenames, <span class="kw">rownames</span>(x))</a>
+<a class="sourceLine" id="cb21-3" data-line-number="3">p &lt;-<span class="st"> </span><span class="kw">length</span>(genenames)</a>
+<a class="sourceLine" id="cb21-4" data-line-number="4">p</a></code></pre></div>
+<pre><code>## [1] 192</code></pre>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1">sx &lt;-<span class="st"> </span>x[<span class="kw">match</span>(genenames, <span class="kw">rownames</span>(x)),]</a>
+<a class="sourceLine" id="cb23-2" data-line-number="2">sout &lt;-<span class="st"> </span><span class="kw">prepareAdjacencyMatrix</span>(sx, group, pathways, <span class="ot">FALSE</span>, <span class="st">'edgelist.txt'</span>, <span class="ot">NULL</span>)</a></code></pre></div>
+<p><code>prepareAdjacencyMatrix</code> returns the pathway indicator matrix that will be used in the <code>NetGSA</code> function. In this example, due to the high overlapping among pathways, the selected genes actually cover 41 pathways.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1"><span class="co"># pathway indicator matrix</span></a>
+<a class="sourceLine" id="cb24-2" data-line-number="2"><span class="kw">dim</span>(sout<span class="op">$</span>B)</a></code></pre></div>
+<pre><code>## [1]  41 192</code></pre>
+<p>The returned 0-1 adjacency matrices from <code>prepareAdjacencyMatrix</code> can be used as network information for estimating the partial correlation network under each condition. We recommend using carefully chosen tuning parameters as this yields better estimates of the networks.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1">ncond &lt;-<span class="st"> </span><span class="kw">length</span>(<span class="kw">unique</span>(group))</a>
+<a class="sourceLine" id="cb26-2" data-line-number="2">Amat &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;list&quot;</span>,ncond)</a>
+<a class="sourceLine" id="cb26-3" data-line-number="3">sx &lt;-<span class="st"> </span>sx[<span class="kw">match</span>(<span class="kw">colnames</span>(sout<span class="op">$</span>B), <span class="kw">rownames</span>(sx)),]</a>
+<a class="sourceLine" id="cb26-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb26-5" data-line-number="5"><span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>ncond){</a>
+<a class="sourceLine" id="cb26-6" data-line-number="6">  data_c &lt;-<span class="st"> </span>sx[,(group<span class="op">==</span>k)]</a>
+<a class="sourceLine" id="cb26-7" data-line-number="7">  <span class="co"># select the tuning parameter</span></a>
+<a class="sourceLine" id="cb26-8" data-line-number="8">  fitBIC &lt;-<span class="st"> </span><span class="kw">bic.netEst.undir</span>(data_c,<span class="dt">one=</span>sout<span class="op">$</span>Adj,</a>
+<a class="sourceLine" id="cb26-9" data-line-number="9">                             <span class="dt">lambda=</span><span class="kw">seq</span>(<span class="dv">1</span>,<span class="dv">10</span>)<span class="op">*</span><span class="kw">sqrt</span>(<span class="kw">log</span>(p)<span class="op">/</span><span class="kw">ncol</span>(data_c)),<span class="dt">eta=</span><span class="fl">0.1</span>)</a>
+<a class="sourceLine" id="cb26-10" data-line-number="10">  <span class="co"># refit the network</span></a>
+<a class="sourceLine" id="cb26-11" data-line-number="11">  fit &lt;-<span class="st"> </span><span class="kw">netEst.undir</span>(data_c,<span class="dt">one=</span>sout<span class="op">$</span>Adj,</a>
+<a class="sourceLine" id="cb26-12" data-line-number="12">                      <span class="dt">lambda=</span><span class="kw">which.min</span>(fitBIC<span class="op">$</span>BIC)<span class="op">*</span><span class="kw">sqrt</span>(<span class="kw">log</span>(p)<span class="op">/</span><span class="kw">ncol</span>(data_c)),<span class="dt">eta=</span><span class="fl">0.1</span>)</a>
+<a class="sourceLine" id="cb26-13" data-line-number="13">  Amat[[k]] &lt;-<span class="st"> </span>fit<span class="op">$</span>Adj</a>
+<a class="sourceLine" id="cb26-14" data-line-number="14">}</a></code></pre></div>
+<p>Given the networks, one can test for pathway enrichment as follows:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1">test1 &lt;-<span class="st"> </span><span class="kw">NetGSA</span>(Amat, sx, group, <span class="dt">pathways =</span> sout<span class="op">$</span>B, <span class="dt">lklMethod =</span> <span class="st">'REHE'</span>)</a>
+<a class="sourceLine" id="cb27-2" data-line-number="2"><span class="kw">head</span>(test1<span class="op">$</span>results)</a></code></pre></div>
+<pre><code>##                             pathway pSize         pval         pFdr
+## 1         Calcium signaling pathway    12 9.152277e-21 3.752434e-19
+## 2           Hippo signaling pathway     6 3.709051e-19 7.603555e-18
+## 3       Chemokine signaling pathway    38 1.015732e-18 1.388167e-17
+## 4    Neurotrophin signaling pathway    45 1.386456e-17 1.421117e-16
+## 5         Insulin signaling pathway    44 6.438692e-13 4.399773e-12
+## 6 Phospholipase D signaling pathway    33 6.300883e-13 4.399773e-12</code></pre>
+<p>Note <code>prepareAdjacencyMatrix</code> can also estimate the networks if the argument <code>estimate_network=TRUE</code>. In such cases, <code>prepareAdjacencyMatrix</code> returns the weighted adjacency matrices estimated under a fixed set of tuning parameters, which may not be optimal. The resulting adjacency matrices can be directly used in <code>NetGSA</code> for pathway enrichment.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" data-line-number="1">sout &lt;-<span class="st"> </span><span class="kw">prepareAdjacencyMatrix</span>(sx, group, pathways, <span class="ot">FALSE</span>, <span class="st">'edgelist.txt'</span>, <span class="ot">NULL</span>, <span class="dt">estimate_network=</span><span class="ot">TRUE</span>, <span class="dt">lambda_c =</span> <span class="dv">9</span>, <span class="dt">eta=</span><span class="fl">0.1</span>)</a>
+<a class="sourceLine" id="cb29-2" data-line-number="2">test2 &lt;-<span class="st"> </span><span class="kw">NetGSA</span>(sout<span class="op">$</span>Amat, sx, group, <span class="dt">pathways =</span> sout<span class="op">$</span>B, <span class="dt">lklMethod =</span> <span class="st">'REHE'</span>)</a>
+<a class="sourceLine" id="cb29-3" data-line-number="3"><span class="kw">head</span>(test2<span class="op">$</span>results)</a></code></pre></div>
+<pre><code>##                                 pathway pSize         pval         pFdr
+## 1           Chemokine signaling pathway    38 1.847896e-22 7.576374e-21
+## 2             Calcium signaling pathway    12 7.942856e-20 1.628285e-18
+## 3               Hippo signaling pathway     6 1.983777e-19 2.711163e-18
+## 4        Neurotrophin signaling pathway    45 1.417895e-18 1.453343e-17
+## 5 Phosphatidylinositol signaling system    10 1.609605e-13 1.319876e-12
+## 6     Phospholipase D signaling pathway    33 8.362044e-13 5.714064e-12</code></pre>
+</div>
+<div id="enrichment-analysis-with-directed-networks" class="section level3">
+<h3>Enrichment analysis with directed networks</h3>
+<p><code>NetGSA</code> can also handle directed networks. For example,</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1"><span class="co"># e.g. the &quot;Adrenergic signaling in cardiomyocytes&quot; pathway from KEGG is a DAG.</span></a>
+<a class="sourceLine" id="cb31-2" data-line-number="2"><span class="kw">print</span>(<span class="kw">is_dag</span>(g))</a></code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" data-line-number="1">genenames &lt;-<span class="st"> </span><span class="kw">V</span>(g)<span class="op">$</span>name</a>
+<a class="sourceLine" id="cb33-2" data-line-number="2">p &lt;-<span class="st"> </span><span class="kw">length</span>(genenames)</a>
+<a class="sourceLine" id="cb33-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb33-4" data-line-number="4"><span class="co"># reorder the variables and get the adjacency matrix</span></a>
+<a class="sourceLine" id="cb33-5" data-line-number="5">reOrder &lt;-<span class="st"> </span><span class="kw">topo_sort</span>(g,<span class="st">&quot;in&quot;</span>)</a>
+<a class="sourceLine" id="cb33-6" data-line-number="6">Adj &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(<span class="kw">get.adjacency</span>(g))</a>
+<a class="sourceLine" id="cb33-7" data-line-number="7">Adj &lt;-<span class="st"> </span>Adj[reOrder,reOrder]</a>
+<a class="sourceLine" id="cb33-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb33-9" data-line-number="9">B &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rep</span>(<span class="dv">1</span>,p),<span class="dt">nrow=</span><span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb33-10" data-line-number="10"><span class="kw">rownames</span>(B) &lt;-<span class="st"> &quot;Adrenergic signaling in cardiomyocytes&quot;</span></a>
+<a class="sourceLine" id="cb33-11" data-line-number="11"><span class="kw">colnames</span>(B) &lt;-<span class="st"> </span><span class="kw">rownames</span>(Adj)</a>
+<a class="sourceLine" id="cb33-12" data-line-number="12">gx &lt;-<span class="st"> </span>x[<span class="kw">match</span>(<span class="kw">rownames</span>(Adj), <span class="kw">rownames</span>(x)),]</a>
+<a class="sourceLine" id="cb33-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb33-14" data-line-number="14">Amat &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;list&quot;</span>, <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb33-15" data-line-number="15"><span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>){</a>
+<a class="sourceLine" id="cb33-16" data-line-number="16">  data_c &lt;-<span class="st"> </span>gx[,<span class="kw">which</span>(group<span class="op">==</span>k)]</a>
+<a class="sourceLine" id="cb33-17" data-line-number="17">  Amat[[k]] &lt;-<span class="st"> </span><span class="kw">netEst.dir</span>(data_c, <span class="dt">one =</span> Adj)<span class="op">$</span>Adj</a>
+<a class="sourceLine" id="cb33-18" data-line-number="18">}</a>
+<a class="sourceLine" id="cb33-19" data-line-number="19">test &lt;-<span class="st"> </span><span class="kw">NetGSA</span>(Amat, gx, group, <span class="dt">pathways =</span> B, <span class="dt">lklMethod =</span> <span class="st">'REHE'</span>)</a></code></pre></div>
+</div>
+</div>
+<div id="references" class="section level2 unnumbered">
+<h2>References</h2>
+<div id="refs" class="references">
+<div id="ref-kanehisa2000kegg">
+<p>Kanehisa, Minoru, and Susumu Goto. 2000. “KEGG: Kyoto Encyclopedia of Genes and Genomes.” <em>Nucleic Acids Research</em> 28 (1). Oxford University Press: 27–30.</p>
+</div>
+<div id="ref-ma2016network">
+<p>Ma, Jing, Ali Shojaie, and George Michailidis. 2016. “Network-Based Pathway Enrichment Analysis with Incomplete Network Information.” <em>Bioinformatics</em> 32 (20). Oxford University Press: 3165–74.</p>
+</div>
+<div id="ref-cancer2012comprehensive">
+<p>TCGA. 2012. “Comprehensive Molecular Portraits of Human Breast Tumours.” <em>Nature</em> 490 (7418). Nature Publishing Group: 61.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
