@@ -1,115 +1,99 @@
-## ----setup, include=FALSE------------------------------------------------
+## ----setup, include=FALSE-----------------------------------------------------
 rm(list=ls())
 knitr::opts_chunk$set(echo = TRUE)
 
-## ----package, eval=FALSE-------------------------------------------------
-#  library(glassoFast)
-#  library(graphite)
-#  library(igraph)
-#  library(msigdbr)
-#  library(netgsa)
-#  library(Rgraphviz)
-
-## ----data----------------------------------------------------------------
-data(breastcancer2012, package = "netgsa")
+## ----data, warning = FALSE, message = FALSE-----------------------------------
+library(netgsa)
+library(graphite)
+library(data.table)
+data("breastcancer2012_subset")
 ls()
 
-## ----rownames------------------------------------------------------------
+## -----------------------------------------------------------------------------
+AnnotationDbi::keytypes(org.Hs.eg.db::org.Hs.eg.db)
+
+## -----------------------------------------------------------------------------
 head(rownames(x))
 
-## ----ER status-----------------------------------------------------------
+## ----ER status----------------------------------------------------------------
 table(group)
 
-## ----edgelist------------------------------------------------------------
-head(edgelist)
+## ---- echo = FALSE------------------------------------------------------------
+sample_edges <- data.table(base_gene_src = c("7534", "8607"), base_id_src = c("ENTREZID", "ENTREZID"), base_gene_dest = c("8607", "7534"), base_id_dest = c("ENTREZID", "ENTREZID"))
+sample_edges
 
-## ----packages, include=FALSE---------------------------------------------
-library(glassoFast)
-library(glmnet)
-library(graphite)
-library(igraph)
-library(msigdbr) 
-library(netgsa)
-
-## ----pathways------------------------------------------------------------
-paths <- pathways('hsapiens','kegg')
+## ----pathways-----------------------------------------------------------------
+paths <- graphite::pathways('hsapiens','kegg')
 paths[[1]]
 head(nodes(paths[[1]]))
 
-## ----preparePathways-----------------------------------------------------
-pathwayList <- preparePathways('kegg')
-head(pathwayList[[1]])
+## -----------------------------------------------------------------------------
+pathways_mat[1:5,7, drop = FALSE]
 
-## ----MSigDB--------------------------------------------------------------
-pathwayList <- preparePathways('MSigDB')
-head(pathwayList[[1]])
+## ---- echo = FALSE------------------------------------------------------------
+as.character(graphite::pathwayDatabases()[graphite::pathwayDatabases()$species == "hsapiens","database"])
 
-## ----our pathways--------------------------------------------------------
-pathways[1:2]
+## -----------------------------------------------------------------------------
+database_search <- obtainEdgeList(rownames(x), c("kegg", "reactome"))
+network_info <- prepareAdjMat(x, group, database_search,
+                                         cluster = TRUE, file_e = "edgelist.txt", 
+                                         file_ne = "nonedgelist.txt")
 
-## ----csv-----------------------------------------------------------------
-write.csv(edgelist,file='edgelist.txt',row.names = FALSE)
-out <- prepareAdjacencyMatrix(x, group, pathways, FALSE, 'edgelist.txt', NULL)
+## -----------------------------------------------------------------------------
+network_info[["Adj"]][[1]][[1]][7:9,7:9]
 
-## ----prepareAdjacencyMatrix----------------------------------------------
-genenames <- unique(c(pathways[[24]], pathways[[52]]))
-genenames <- intersect(genenames, rownames(x))
-p <- length(genenames)
-p
-sx <- x[match(genenames, rownames(x)),]
-sout <- prepareAdjacencyMatrix(sx, group, pathways, FALSE, 'edgelist.txt', NULL)
+## -----------------------------------------------------------------------------
+length(network_info[["Adj"]][[1]])
 
-## ----B-------------------------------------------------------------------
-# pathway indicator matrix
-dim(sout$B)
+## -----------------------------------------------------------------------------
+pathway_tests_rehe <- NetGSA(network_info[["Adj"]], x, group, pathways_mat, 
+                             lklMethod = "REHE", sampling = TRUE, 
+                             sample_n = 0.25, sample_p = 0.25)
 
-## ----estimate matrices---------------------------------------------------
-ncond <- length(unique(group))
-Amat <- vector("list",ncond)
-sx <- sx[match(colnames(sout$B), rownames(sx)),]
+## ---- eval = FALSE------------------------------------------------------------
+#  plot.NetGSA(pathway_tests_rehe)
 
-for (k in 1:ncond){
-  data_c <- sx[,(group==k)]
-  # select the tuning parameter
-  fitBIC <- bic.netEst.undir(data_c,one=sout$Adj,
-                             lambda=seq(1,10)*sqrt(log(p)/ncol(data_c)),eta=0.1)
-  # refit the network
-  fit <- netEst.undir(data_c,one=sout$Adj,
-                      lambda=which.min(fitBIC$BIC)*sqrt(log(p)/ncol(data_c)),eta=0.1)
-  Amat[[k]] <- fit$Adj
-}
+## ---- fig.retina=NULL, out.width=600, echo=FALSE------------------------------
+    knitr::include_graphics("cyto_pathway_network_default.png")
 
-## ----netgsa 1------------------------------------------------------------
-test1 <- NetGSA(Amat, sx, group, pathways = sout$B, lklMethod = 'REHE')
-head(test1$results)
+## ---- eval = FALSE------------------------------------------------------------
+#  formatPathways(pathway_tests_rehe, "ErbB signaling pathway")
 
-## ----netgsa 2------------------------------------------------------------
-sout <- prepareAdjacencyMatrix(sx, group, pathways, FALSE, 'edgelist.txt', NULL, estimate_network=TRUE, lambda_c = 9, eta=0.1)
-test2 <- NetGSA(sout$Amat, sx, group, pathways = sout$B, lklMethod = 'REHE')
-head(test2$results)
+## ---- fig.retina=NULL, out.width=600, echo=FALSE------------------------------
+knitr::include_graphics("cyto_erbb.png")
 
-## ----netgsa DAG----------------------------------------------------------
-# e.g. the "Adrenergic signaling in cardiomyocytes" pathway from KEGG is a DAG.
-print(is_dag(g))
+## ---- fig.retina=NULL, out.width=600, echo=FALSE------------------------------
+knitr::include_graphics("cyto_legend.png")
 
-genenames <- V(g)$name
-p <- length(genenames)
+## ---- fig.retina=NULL, out.width=600, echo=FALSE------------------------------
+knitr::include_graphics("igraph_cyto_pathway_network_default.png")
 
-# reorder the variables and get the adjacency matrix
-reOrder <- topo_sort(g,"in")
-Adj <- as.matrix(get.adjacency(g))
-Adj <- Adj[reOrder,reOrder]
+## ---- eval = FALSE------------------------------------------------------------
+#  # Format the "Neurotrophin signaling pathway" using the "degree-circle" layout
+#  formatPathways(pathway_tests_rehe, "Neurotrophin signaling pathway",
+#               graph_layout = "degree-circle")
 
-B <- matrix(rep(1,p),nrow=1)
-rownames(B) <- "Adrenergic signaling in cardiomyocytes"
-colnames(B) <- rownames(Adj)
-gx <- x[match(rownames(Adj), rownames(x)),]
+## ---- eval = FALSE------------------------------------------------------------
+#  RCy3::setCurrentNetwork("Pathway Network")
+#  edge_weights <- RCy3::getTableColumns(table = "edge", columns = "weight")
+#  RCy3::setEdgeLineWidthMapping("weight", c(min(edge_weights), max(edge_weights)), c(1,5))
 
-Amat <- vector("list", 2)
-for (k in 1:2){
-  data_c <- gx[,which(group==k)]
-  Amat[[k]] <- netEst.dir(data_c, one = Adj)$Adj
-}
-test <- NetGSA(Amat, gx, group, pathways = B, lklMethod = 'REHE')
+## ---- eval = FALSE------------------------------------------------------------
+#  plot(pathway_tests_rehe)
 
+## ---- fig.retina=NULL, out.width=600, echo=FALSE------------------------------
+knitr::include_graphics("igraph_pathway_network_default.png")
+
+## ---- fig.retina=NULL, out.width=600, echo=FALSE------------------------------
+knitr::include_graphics("igraph_legend.png")
+
+## ---- eval = FALSE------------------------------------------------------------
+#  layout_fun <- function(ig) igraph::layout_randomly(ig)
+#  plot(pathway_tests_rehe, graph_layout = layout_fun)
+
+## ---- eval = FALSE------------------------------------------------------------
+#  zoomPathway(pathway_tests_rehe, "ErbB signaling pathway")
+
+## ---- fig.retina=NULL, out.width=600, echo=FALSE------------------------------
+knitr::include_graphics("igraph_erbb.png")
 

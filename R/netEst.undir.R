@@ -1,9 +1,9 @@
 netEst.undir <-
-  function(x, zero = NULL, one = NULL, lambda, rho=NULL, weight= NULL, eta=0, verbose = FALSE, eps = 1e-08) {
+  function(x, zero = NULL, one = NULL, lambda, rho=NULL, penalize_diag = TRUE, weight = NULL, eta=0, verbose = FALSE, eps = 1e-08) {
     p <- nrow(x)
     n <- ncol(x)
     
-    Adj = matrix(0, p, p)
+    Adj = lapply(1:length(lambda), function(x) matrix(0, p, p))
     Ip = diag(rep(1, p))
     
     if (is.null(zero)) {
@@ -30,7 +30,7 @@ netEst.undir <-
       stop("Information on 0's and 1's overlaps!")
     }
     
-    if (abs(lambda) < eps){
+    if (any(abs(lambda) < eps)){
       stop("The penalty parameter lambda needs to be greater than zero!")
     }
     
@@ -58,7 +58,7 @@ netEst.undir <-
     # check if network information is complete
     if ( identical(one+zero, matrix(1,p,p)-diag(p)) && (weight == 0)){
       cat("Network information is complete! \n")
-      Adj = one
+      Adj = lapply(Adj, function(nothing) return(one))
     } else {
       if (!is.null(weight) ){
         if (weight < -1e-16){
@@ -69,11 +69,11 @@ netEst.undir <-
       # estimate the network topology
       for (i in 1:p) {
         Y = matrix(X[, i], ncol = 1)
-        Xmat = X[, -i]
+        Xmat = X[, -i, drop = FALSE]
         
         ## Get the zero and one indices. 
         infoInd = one[i, -i] - zero[i, -i]
-        beta = matrix(0, p - 1, 1)
+        beta = matrix(0, p - 1, length(lambda)) ## For multiple lambda sequence
         
         if (sum(infoInd == 0) == 0) {
           if (verbose) {
@@ -90,7 +90,6 @@ netEst.undir <-
           if (verbose) {
             cat("Incomplete information known! \n ")
           }
-          
           if (sum(infoInd == -1) == 0) {
             if (sum(infoInd == 1) == 0) {
               if (verbose) {
@@ -108,9 +107,13 @@ netEst.undir <-
                 Xmat1 = matrix(Xmat[, (infoInd == 1)], ncol=sum(infoInd == 1)) ##known edges 
                 Xmat2 = matrix(Xmat[, (infoInd == 0)], ncol=sum(infoInd == 0)) ##unknown edges 
                 beta[(infoInd == 1), ] = glmnet.soft(Xmat1, Y, lambda = lambda*weight)
-                tmp = as.matrix(beta[(infoInd == 1), ])
-                res.glm = Y - Xmat1 %*% tmp
-                beta[(infoInd == 0), ] = glmnet.soft(Xmat2, res.glm, lambda = lambda)
+                tmp = as.matrix(beta[(infoInd == 1), , drop = FALSE])
+                tmp_col_fit = do.call(cbind,
+                                      lapply(1:length(lambda), function(i){
+                                        res.glm = Y - Xmat1 %*Cpp% tmp[,i]
+                                        return(glmnet.soft(Xmat2, res.glm, lambda = lambda[i]))
+                                      }))
+                beta[(infoInd == 0), ] = tmp_col_fit
               }
             }
           } else {
@@ -119,7 +122,7 @@ netEst.undir <-
                 cat("Incomplete information: with 0's and no 1's! \n ")
               }
               beta[(infoInd == -1), ] = 0
-              Xnew = Xmat[, (infoInd != -1)]
+              Xnew = Xmat[, (infoInd != -1), drop = FALSE]
               beta[(infoInd != -1), ] = glmnet.soft(Xnew, Y, lambda = lambda)
             } else {
               if (verbose) {
@@ -129,38 +132,56 @@ netEst.undir <-
               Xmat1 = matrix(Xmat[, (infoInd == 1)], ncol=sum(infoInd == 1)) ##known edges 
               Xmat2 = matrix(Xmat[, (infoInd == 0)], ncol=sum(infoInd == 0)) ##unknown edges 
               beta[(infoInd == 1), ] = glmnet.soft(Xmat1, Y, lambda = lambda*weight) 
-              tmp = as.matrix(beta[(infoInd == 1), ])
-              res.glm = Y - Xmat1 %*% tmp
-              beta[(infoInd == 0), ] = glmnet.soft(Xmat2, res.glm, lambda = lambda)
+              tmp = as.matrix(beta[(infoInd == 1), , drop = FALSE])
+              tmp_col_fit = do.call(cbind,
+                                    lapply(1:length(lambda), function(i){
+                                          res.glm = Y - Xmat1 %*Cpp% tmp[,i]
+                                          return(glmnet.soft(Xmat2, res.glm, lambda = lambda[i]))
+                                      }))
+              beta[(infoInd == 0), ] = tmp_col_fit
             }
           }
         }
-        Adj[i, -i] = as.vector(beta);
+        # Fill Adj[[1]] row with beta[,1], and Adj[[2]] with beta[,2], etc
+        Adj <- Map(function(Amat, lam_num)  {Amat[i, -i] = as.vector(beta[,lam_num])
+                                             return(Amat)}, Adj, 1:length(lambda))
       }
       
       ## symmetrization 
-      Adj = (Adj + t(Adj))/2
-      Adj = (abs(Adj) > eps)
-      diag(Adj) = 0; 
+      Adj = lapply(Adj, function(Amat){
+        temp = (Amat + t(Amat))/2
+        temp = (abs(temp) > eps)
+        diag(temp) = 0
+        return(temp)
+        })
     }
-    
-    empcov = cov(X) 
+
+    empcov = cov(X)
     if (kappa(empcov) > 1e+3){
       empcov = empcov + eta * diag(p)
     }
-    
+    diag_penalty <- ifelse(penalize_diag, 0.01*sqrt(log(p)/n), 0)
     BIG = 10e9
-    rhoM[which(Adj==0)] = BIG;
-    diag(rhoM) = 0.01*sqrt(log(p)/n)
-    
-    ## estimate the partial correlation matrix using fast graphical lasso 
-    obj <- glassoFast(empcov, rho = rhoM)
-    siginv <- chol2inv(chol(obj$w))
-    
-    partialCor <- Ip - cov2cor(siginv)
-    partialCor[abs(partialCor) < 1e-08] <- 0
-    rownames(partialCor) <- rownames(x);
-    colnames(partialCor) <- rownames(x);
-    
+    partialCor_l <- lapply(Adj, function(Amat){
+      rhoM[which(Amat==0)] = BIG;
+      diag(rhoM) = diag_penalty
+      
+      #No need to handle singleton clusters. They shouldn't exist here. Are handled in netEstClusts function
+      obj <- glassoFast(empcov, rho = rhoM, thr = 1e-4) #Threshold must be < threshold for determining an edge
+      siginv <- chol2inv(cholCpp(obj$w))
+
+      partialCor <- Ip - cov2cor(siginv)
+      partialCor[abs(partialCor) < 1e-08] <- 0
+      rownames(partialCor) <- rownames(x); colnames(partialCor) <- rownames(x);
+      rownames(siginv) <- rownames(x); colnames(siginv) <- rownames(x);
+      out <- list(partialCor=partialCor,siginv=siginv,lambda=lambda)
+      #out <- calcPartialCor(Amat, rhoM, empcov, rownames(x))
+      return(out)
+    })
+
+    partialCor <- lapply(partialCor_l, "[[", "partialCor")
+    siginv     <- lapply(partialCor_l, "[[", "siginv")
+
+
     return(list(Adj=partialCor,invcov=siginv,lambda=lambda))
   }

@@ -36,7 +36,7 @@ Note when the penalty parameter \code{lambda} is too large, the estimated adjace
 \item{df}{The degrees of freedom corresponding to each BIC.}
 }
 \references{
-Ma, J., Shojaie, A. & Michailidis, G. (2016) Network-based pathway enrichment analysis with incomplete network information. Bioinformatics 32(20):165--3174. \url{https://doi.org/10.1093/bioinformatics/btw410}
+Ma, J., Shojaie, A. & Michailidis, G. (2016) Network-based pathway enrichment analysis with incomplete network information. Bioinformatics 32(20):165--3174. \doi{10.1093/bioinformatics/btw410}
 }
 \author{
 Jing Ma
@@ -44,40 +44,4 @@ Jing Ma
 
 \seealso{
 \code{\link{netEst.undir}}
-}
-\examples{
-
-library(glassoFast)
-library(igraph)
-
-set.seed(1)
-
-## load the data
-data(breastcancer2012)
-
-## consider genes from the "ErbB signaling pathway" and "Jak-STAT signaling pathway"
-genenames <- unique(c(pathways[[24]], pathways[[52]]))
-p <- length(genenames)
-sx <- x[match(genenames, rownames(x)),]
-if (sum(is.na(rownames(sx)))>0){
-  sx <- sx[-which(is.na(rownames(sx))),]
-}
-file_e <- system.file("extdata", "edgelist.txt", package = "netgsa")
-out <- prepareAdjacencyMatrix(sx, group, pathways, FALSE, file_e, NULL)
-sx <- sx[match(colnames(out$B), rownames(sx)),]
-
-ncond <- length(unique(group))
-Amat <- vector("list",ncond)
-
-## -- Not run --
-
-# for (k in 1:ncond){
-#   data_c <- sx[,(group==k)]
-#   fitBIC <- bic.netEst.undir(data_c,one=out$Adj,
-#                              lambda=seq(1,10)*sqrt(log(p)/ncol(data_c)),eta=0.1)
-#   fit <- netEst.undir(data_c,one=out$Adj,
-#                       lambda=which.min(fitBIC$BIC)*sqrt(log(p)/ncol(data_c)),eta=0.1)
-#   Amat[[k]] <- fit$Adj
-# }
-
 }

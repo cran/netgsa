@@ -3,12 +3,12 @@
 \title{Network-based Gene Set Analysis}
 \description{Tests the significance of pre-defined sets of genes (pathways) with respect to an outcome variable, such as the condition indicator (e.g. cancer vs. normal, etc.), based on the underlying biological networks.}
 \usage{
-NetGSA(A, x, group, pathways, lklMethod = c("REML", "ML", "HE", "REHE"), 
+NetGSA(A, x, group, pathways, lklMethod = "REHE", 
        sampling=FALSE, sample_n = NULL, sample_p = NULL, minsize=5, 
        eta = 0.1, lim4kappa = 500)
 }
 \arguments{
-  \item{A}{A list of weighted adjacency matrices.}
+  \item{A}{A list of weighted adjacency matrices. Typically returned from \code{prepareAdjMat}}
   \item{x}{The \eqn{p \times n}{p x n} data matrix with rows referring to genes and columns to samples. It is very important that the adjacency matrices \code{A} share the same rownames as the data matrix \code{x}.}
   \item{group}{Vector of class indicators of length \eqn{n}.}
   \item{pathways}{The npath by \eqn{p} indicator matrix for pathways.}
@@ -32,90 +32,46 @@ For a one-sample or two-sample test, the test statistic \eqn{T} for each gene se
 
 Estimation of the variance components (\eqn{\sigma^2_{\epsilon}} and \eqn{\sigma^2_{\gamma}}) can be done in several different ways after profiling out \eqn{\sigma^2_{\epsilon}}, including \code{REML/ML} which uses Newton's method or \code{HE/REHE} which is based on the Haseman-Elston regression method. The latter notes the fact that \eqn{Var(X)=\sigma^2_{\gamma}\Pi*\Pi' + \sigma^2_{\epsilon}I}, and uses an ordinary least squares to solve for the unknown coefficients after vectorizing both sides. In particular, \code{REHE} uses nonnegative least squares for the regression and therefore ensures nonnegative estimate of the variance components. Due to the simple formulation, \code{HE/REHE} also allows subsampling with respect to both the samples and the variables, and is recommended especially when the problem is large (i.e. large \eqn{p} and/or large \eqn{n}).
 
-The pathway membership information is stored in \code{pathways}, which should be a matrix of \eqn{npath} x \eqn{p}. See \code{\link{prepareAdjacencyMatrix}} for details on how to prepare a suitable pathway membership object.
+The pathway membership information is stored in \code{pathways}, which should be a matrix of \eqn{npath} x \eqn{p}. See \code{\link{prepareAdjMat}} for details on how to prepare a suitable pathway membership object.
 
 This function can deal with both directed and undirected networks, which are specified via the option \code{directed}. Note \code{NetGSA} uses slightly different procedures to calculate the influence matrices for directed and undirected networks. 
 In either case, the user can still apply \code{NetGSA} if only partial information on the adjacency matrices is available. The functions \code{netEst.undir} and \code{netEst.dir} provide details on how to estimate the weighted adjacency matrices from data based on available network information. 
 }
 \value{
 A list with components
-\item{results}{A data frame with pathway names, pathway sizes, p-values and false discovery rate corrected q-values for all pathways.}
-\item{beta}{Vector of fixed effects of length \eqn{2p}, of which the first half is for condition 1 and the second half for condition 2.}
+\item{results}{A data frame with pathway names, pathway sizes, p-values and false discovery rate corrected q-values, and test statistic for all pathways.}
+\item{beta}{Vector of fixed effects of length \eqn{kp}, the first k elements corresponds to condition 1, the second k to condition 2, etc}
 \item{s2.epsilon}{Variance of the random errors \eqn{\epsilon}.}
 \item{s2.gamma}{Variance of the random effects \eqn{\gamma}.}
+\item{graph}{List of components needed in \code{plot.NetGSA}.}
 }
 \references{
-Ma, J., Shojaie, A. & Michailidis, G. (2016) Network-based pathway enrichment analysis with incomplete network information. Bioinformatics 32(20):165--3174. \url{https://doi.org/10.1093/bioinformatics/btw410}
+Ma, J., Shojaie, A. & Michailidis, G. (2016) Network-based pathway enrichment analysis with incomplete network information. Bioinformatics 32(20):165--3174. \doi{10.1093/bioinformatics/btw410}
 
-Shojaie, A., & Michailidis, G. (2010). Network enrichment analysis in complex experiments. Statistical applications in genetics and molecular biology, 9(1), Article 22. \url{http://www.ncbi.nlm.nih.gov/pubmed/20597848}.
+Shojaie, A., & Michailidis, G. (2010). Network enrichment analysis in complex experiments. Statistical applications in genetics and molecular biology, 9(1), Article 22. \url{https://pubmed.ncbi.nlm.nih.gov/20597848/}.
 
-Shojaie, A., & Michailidis, G. (2009). Analysis of gene sets based on the underlying regulatory network. Journal of Computational Biology, 16(3), 407-426. \url{http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3131840/}
+Shojaie, A., & Michailidis, G. (2009). Analysis of gene sets based on the underlying regulatory network. Journal of Computational Biology, 16(3), 407-426. \url{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3131840/}
 
 }
 \author{
 Ali Shojaie and Jing Ma
 }
 \seealso{
-\code{\link{prepareAdjacencyMatrix}}, \code{\link{netEst.dir}}, \code{\link{netEst.undir}}
+\code{\link{prepareAdjMat}}, \code{\link{netEst.dir}}, \code{\link{netEst.undir}}
 }
 \examples{
-library(glassoFast)
-library(glmnet)
-library(igraph)
+\donttest{
+## load the data
+data("breastcancer2012_subset")
 
-set.seed(1)
-data(breastcancer2012)
+## consider genes from just 2 pathways
+genenames    <- unique(c(pathways[["Adipocytokine signaling pathway"]], 
+                         pathways[["Adrenergic signaling in cardiomyocytes"]]))
+sx           <- x[match(rownames(x), genenames, nomatch = 0L) > 0L,]
 
-
-## -----------------Undirected networks-----------------
-## consider genes from the "ErbB signaling pathway" and "Jak-STAT signaling pathway"
-genenames <- unique(c(pathways[[24]], pathways[[52]]))
-p <- length(genenames)
-sx <- x[match(genenames, rownames(x)),]
-if (sum(is.na(rownames(sx)))>0){
-  sx <- sx[-which(is.na(rownames(sx))),]
+db_edges       <- obtainEdgeList(rownames(sx), databases = c("kegg", "reactome"))
+adj_cluster    <- prepareAdjMat(sx, group, databases = db_edges, cluster = TRUE)
+out_cluster    <- NetGSA(adj_cluster[["Adj"]], sx, group, 
+                         pathways_mat[c(1,2), rownames(sx)], lklMethod = "REHE", sampling = FALSE)
 }
-file_e <- system.file("extdata", "edgelist.txt", package = "netgsa")
-out <- prepareAdjacencyMatrix(sx, group, pathways, FALSE, file_e, NULL)
-sx <- sx[match(colnames(out$B), rownames(sx)),]
-
-ncond <- length(unique(group))
-Amat <- vector("list",ncond)
-
-## -- Not run --
-# for (k in 1:ncond){
-#  data_c <- sx[,(group==k)]
-#  fitBIC <- bic.netEst.undir(data_c,one=out$Adj,
-#                             lambda=seq(1,10)*sqrt(log(p)/ncol(data_c)),eta=0.1)
-#  fit <- netEst.undir(data_c,one=out$Adj,
-#                      lambda=which.min(fitBIC$BIC)*sqrt(log(p)/ncol(data_c)),eta=0.1)
-#  Amat[[k]] <- fit$Adj
-# }
-# test <- NetGSA(Amat, sx, group, pathways = out$B, lklMethod = 'REHE')
-
-## -------------------Directed networks------------------
-## NetGSA also works for directed acyclic graphs (DAGs).
-# e.g. the "Adrenergic signaling in cardiomyocytes" pathway from KEGG is a DAG.
-print(is_dag(g))
-
-genenames <- V(g)$name
-p <- length(genenames)
-
-# reorder the variables and get the adjacency matrix
-reOrder <- topo_sort(g,"in")
-Adj <- as.matrix(get.adjacency(g))
-Adj <- Adj[reOrder,reOrder]
-
-B <- matrix(rep(1,p),nrow=1)
-rownames(B) <- "Adrenergic signaling in cardiomyocytes"
-colnames(B) <- rownames(Adj)
-gx <- x[match(rownames(Adj), rownames(x)),]
-
-Amat <- vector("list", 2)
-# for (k in 1:2){
-#   data_c <- gx[,which(group==k)]
-#   Amat[[k]] <- netEst.dir(data_c, one = Adj)$Adj
-# }
-# test <- NetGSA(Amat, gx, group, pathways = B, lklMethod = 'REHE')
-
 }

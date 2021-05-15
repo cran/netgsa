@@ -5,10 +5,12 @@ function(se0, sg0, D, r, n_vec, control=NULL){
       tol = 0.01
       s2profile = "se"
       lklMethod = "REML"
+      maxIter = 100
     } else {
       tol = control$tol
       s2profile = control$s2profile
       lklMethod = control$lklMethod
+      maxIter = control$maxIter
     }
     
     matTr <- function(z) sum(diag(z))
@@ -29,7 +31,7 @@ function(se0, sg0, D, r, n_vec, control=NULL){
         Rm[[loop_cond]] = Rm[[loop_cond]] +  tmp[, i] %o% tmp[, i]
       }
     }
-    DtD = lapply(1:ncond, function(k) D[[k]] %*% t(D[[k]]))
+    DtD = lapply(1:ncond, function(k) D[[k]] %*Cpp% t(D[[k]]))
     
     gap = 1
     sg = sg0
@@ -38,14 +40,14 @@ function(se0, sg0, D, r, n_vec, control=NULL){
     ## Whether it's ML or REML
     lklConst = ifelse(lklMethod == "REML", N - ncond*p, N)
     
-    while (gap > tol) {
+    while (gap > tol & cnt <= maxIter) {
       sg0 = sg
       se0 = se
       
       # print(cnt)
       cnt = cnt + 1
       
-      SS = lapply(1:ncond, function(k) solve(sg * DtD[[k]] + se*Ip) %*% Rm[[k]] )
+      SS = lapply(1:ncond, function(k) solveCpp(sg * DtD[[k]] + se*Ip) %*Cpp% Rm[[k]] )
       tmp0 = lapply(SS, matTr)
       tmp0 = Reduce("+", tmp0)
       
@@ -57,7 +59,7 @@ function(se0, sg0, D, r, n_vec, control=NULL){
           tmp = min(diag(tmp1))
           tmp = min(se, tmp)
           tmp1 = tmp1 - diag(rep(tmp, p))
-          tmp2[[loop_cond]] = solve(D[[loop_cond]]) %*% tmp1  
+          tmp2[[loop_cond]] = solveCpp(D[[loop_cond]]) %*Cpp% tmp1  
         }
         
         tmp3 = lapply(tmp2, function(A) mean(diag(A)))      
@@ -71,7 +73,7 @@ function(se0, sg0, D, r, n_vec, control=NULL){
           tmp = min(diag(tmp1))
           tmp = min(sg, tmp)
           tmp1 = tmp1 - diag(rep(tmp, p))
-          tmp2[[loop_cond]] = solve(D[[loop_cond]]) %*% tmp1  
+          tmp2[[loop_cond]] = solveCpp(D[[loop_cond]]) %*Cpp% tmp1  
         }
         
         tmp3 = lapply(tmp2, function(A) mean(diag(A)))  
@@ -80,6 +82,7 @@ function(se0, sg0, D, r, n_vec, control=NULL){
       }
       
       gap = abs(sg - sg0) + abs(se - se0)
+      if(cnt == maxIter) warning(paste0("Maximum number of iterations reached for variance estimate convergence: ", maxIter))
     }
     
     return(list(s2e = se, s2g = sg, tau = tau, finalgap = gap, niter = cnt))
