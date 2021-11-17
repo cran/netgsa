@@ -1,4 +1,4 @@
-9de5f3043188a85823aeaf1ebbaafc59 *DESCRIPTION
+2de2f474d170c619d89e1d34c7d3ea45 *DESCRIPTION
 6e3766e8f9d0a17a54c31801da5dfcff *NAMESPACE
 298066f9750e84cd23647f745903f841 *NEWS.md
 353793cf50460a4ffb3f8775e15648b5 *R/NetGSA.R
@@ -28,12 +28,12 @@ c09fcb5a8802a5fa6f1ff4e0c23283d8 *R/preparePathways.R
 30b8654a3c31085bd9fce6b1ad5b041a *R/profile.newton.se.R
 57494c38a760fee705c0336bad365c57 *R/zeroInd.R
 b347be04da8ef09a3323e2834f0f86b3 *README.md
-324c064ab42ff7487d7091b50a1f54ad *build/partial.rdb
-6751e07f7f0e9d02ab05b63c2606e918 *build/vignette.rds
+866ceeae3871c2c2351e56e72c64d51c *build/partial.rdb
+3b44282a14fb71a382312c2d52bb7cea *build/vignette.rds
 a51792ef269dfff8e09ef103a43b4f87 *data/breastcancer2012_subset.rda
 dc634933af4e2de248f542237375a7a1 *inst/doc/netgsa.R
 19b8a6f2777d42fc88a30169a3b2f8c4 *inst/doc/netgsa.Rmd
-b8af22e0b9a98bd00af00f04e5a02af7 *inst/doc/netgsa.html
+badf96bef30076e3fee7eff46cd18ea2 *inst/doc/netgsa.html
 de3dc0c78c156cd07163eb3d48326521 *man/NetGSA.Rd
 28174aabf0f354c40fb56f5e0874f598 *man/NetGSAq.Rd
 497529709bf069fdcf7e9dbc7beb55d7 *man/bic.netEst.undir.Rd

@@ -1,8 +1,8 @@
 Package: netgsa
 Type: Package
 Title: Network-Based Gene Set Analysis
-Version: 4.0.1
-Date: 2021-09-13
+Version: 4.0.2
+Date: 2021-11-17
 Authors@R: c(
     person("Michael", "Hellstern", email = "mikeh1@uw.edu", role = c("aut","cre")),
     person("Ali", "Shojaie", email = "ashojaie@uw.edu", role = c("aut")),
@@ -24,11 +24,11 @@ VignetteBuilder: knitr
 URL: https://github.com/mikehellstern/netgsa
 RoxygenNote: 7.1.1
 NeedsCompilation: yes
-Packaged: 2021-09-13 16:16:25 UTC; mike
+Packaged: 2021-11-17 19:57:54 UTC; mike
 Author: Michael Hellstern [aut, cre],
   Ali Shojaie [aut],
   Jing Ma [aut],
   Kun Yue [aut]
 Maintainer: Michael Hellstern <mikeh1@uw.edu>
 Repository: CRAN
-Date/Publication: 2021-09-13 17:30:02 UTC
+Date/Publication: 2021-11-17 20:30:02 UTC

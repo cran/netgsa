@@ -12,7 +12,7 @@
 
 <meta name="author" content="Jing Ma, Michael Hellstern" />
 
-<meta name="date" content="2021-09-13" />
+<meta name="date" content="2021-11-17" />
 
 <title>netgsa: Network-based Gene Set Analysis</title>
 
@@ -37,72 +37,17 @@ document.addEventListener('DOMContentLoaded', function(e) {
   div.column{display: inline-block; vertical-align: top; width: 50%;}
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
   ul.task-list{list-style: none;}
-      pre > code.sourceCode { white-space: pre; position: relative; }
-      pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-      pre > code.sourceCode > span:empty { height: 1.2em; }
-      code.sourceCode > span { color: inherit; text-decoration: inherit; }
-      div.sourceCode { margin: 1em 0; }
-      pre.sourceCode { margin: 0; }
-      @media screen {
-      div.sourceCode { overflow: auto; }
-      }
-      @media print {
-      pre > code.sourceCode { white-space: pre-wrap; }
-      pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-      }
-      pre.numberSource code
-        { counter-reset: source-line 0; }
-      pre.numberSource code > span
-        { position: relative; left: -4em; counter-increment: source-line; }
-      pre.numberSource code > span > a:first-child::before
-        { content: counter(source-line);
-          position: relative; left: -1em; text-align: right; vertical-align: baseline;
-          border: none; display: inline-block;
-          -webkit-touch-callout: none; -webkit-user-select: none;
-          -khtml-user-select: none; -moz-user-select: none;
-          -ms-user-select: none; user-select: none;
-          padding: 0 4px; width: 4em;
-          color: #aaaaaa;
-        }
-      pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-      div.sourceCode
-        {   }
-      @media screen {
-      pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-      }
-      code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-      code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-      code span.at { color: #7d9029; } /* Attribute */
-      code span.bn { color: #40a070; } /* BaseN */
-      code span.bu { } /* BuiltIn */
-      code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-      code span.ch { color: #4070a0; } /* Char */
-      code span.cn { color: #880000; } /* Constant */
-      code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-      code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-      code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-      code span.dt { color: #902000; } /* DataType */
-      code span.dv { color: #40a070; } /* DecVal */
-      code span.er { color: #ff0000; font-weight: bold; } /* Error */
-      code span.ex { } /* Extension */
-      code span.fl { color: #40a070; } /* Float */
-      code span.fu { color: #06287e; } /* Function */
-      code span.im { } /* Import */
-      code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-      code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-      code span.op { color: #666666; } /* Operator */
-      code span.ot { color: #007020; } /* Other */
-      code span.pp { color: #bc7a00; } /* Preprocessor */
-      code span.sc { color: #4070a0; } /* SpecialChar */
-      code span.ss { color: #bb6688; } /* SpecialString */
-      code span.st { color: #4070a0; } /* String */
-      code span.va { color: #19177c; } /* Variable */
-      code span.vs { color: #4070a0; } /* VerbatimString */
-      code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
     </style>
 
 
-<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
@@ -189,6 +134,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 })();
 </script>
+
 
 
 
@@ -386,7 +332,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">netgsa: Network-based Gene Set Analysis</h1>
 <h4 class="author">Jing Ma, Michael Hellstern</h4>
-<h4 class="date">2021-09-13</h4>
+<h4 class="date">2021-11-17</h4>
 
 
 
@@ -425,9 +371,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <pre><code>## </code></pre>
 <pre><code>##  [1] &quot;ACCNUM&quot;       &quot;ALIAS&quot;        &quot;ENSEMBL&quot;      &quot;ENSEMBLPROT&quot;  &quot;ENSEMBLTRANS&quot;
 ##  [6] &quot;ENTREZID&quot;     &quot;ENZYME&quot;       &quot;EVIDENCE&quot;     &quot;EVIDENCEALL&quot;  &quot;GENENAME&quot;    
-## [11] &quot;GO&quot;           &quot;GOALL&quot;        &quot;IPI&quot;          &quot;MAP&quot;          &quot;OMIM&quot;        
-## [16] &quot;ONTOLOGY&quot;     &quot;ONTOLOGYALL&quot;  &quot;PATH&quot;         &quot;PFAM&quot;         &quot;PMID&quot;        
-## [21] &quot;PROSITE&quot;      &quot;REFSEQ&quot;       &quot;SYMBOL&quot;       &quot;UCSCKG&quot;       &quot;UNIGENE&quot;     
+## [11] &quot;GENETYPE&quot;     &quot;GO&quot;           &quot;GOALL&quot;        &quot;IPI&quot;          &quot;MAP&quot;         
+## [16] &quot;OMIM&quot;         &quot;ONTOLOGY&quot;     &quot;ONTOLOGYALL&quot;  &quot;PATH&quot;         &quot;PFAM&quot;        
+## [21] &quot;PMID&quot;         &quot;PROSITE&quot;      &quot;REFSEQ&quot;       &quot;SYMBOL&quot;       &quot;UCSCKG&quot;      
 ## [26] &quot;UNIPROT&quot;</code></pre>
 <!-- For metabolites, `netgsa` uses `graphite`'s built in metabolite mapping. These are: -->
 <!-- ```{r} -->
@@ -472,9 +418,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## Native ID       = hsa:00010
 ## Database        = KEGG
 ## Species         = hsapiens
-## Number of nodes = 94
-## Number of edges = 1191
-## Retrieved on    = 22-04-2020
+## Number of nodes = 93
+## Number of edges = 1146
+## Retrieved on    = 16-10-2021
 ## URL             = http://www.kegg.jp/kegg-bin/show_pathway?org_name=hsa&amp;mapno=00010</code></pre>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a><span class="kw">head</span>(<span class="kw">nodes</span>(paths[[<span class="dv">1</span>]]))</span></code></pre></div>
 <pre><code>## [1] &quot;ENTREZID:10327&quot; &quot;ENTREZID:124&quot;   &quot;ENTREZID:125&quot;   &quot;ENTREZID:126&quot;  
@@ -505,8 +451,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h3>prepareAdjMat</h3>
 <p>After having the data set-up, the first step in pathway enrichment analysis with <code>netgsa</code> is to estimate the adjacency matrices. Remember, the rownames of the data matrix <code>X</code> must be named as <code>&quot;GENE_ID:GENE_VALUE&quot;</code> as in <code>&quot;ENTREZID:7534&quot;</code>. The <code>group</code> vector is defined as above.</p>
 <p>The <code>databases</code> argument can be either (1) the result of <code>obtainEdgeList</code> or (2) a character vector defining the databases to search. These are essentially the same thing, the only difference is that for the character vector method, <code>obtainEdgeList</code> is called inside <code>prepareAdjMat</code> and cannot be saved. Since <code>prepareAdjMat</code> queries the <code>graphite</code> databases when it is called and <code>graphite</code> databases can change overtime, this may not be desirable for reproducibility. Using the <code>obtainEdgeList</code> method, one can save the edgelist to ensure the same network information is used across iterations or in the future. In both methods, one must specify the databases to search. The options are the databases for homo spaiens available in <code>graphite</code> or NDEx (only for development version on Github). The graphite databases are:</p>
-<pre><code>## [1] &quot;biocarta&quot; &quot;kegg&quot;     &quot;nci&quot;      &quot;panther&quot;  &quot;pathbank&quot; &quot;pharmgkb&quot; &quot;reactome&quot;
-## [8] &quot;smpdb&quot;</code></pre>
+<pre><code>## [1] &quot;kegg&quot;         &quot;panther&quot;      &quot;pathbank&quot;     &quot;pharmgkb&quot;     &quot;reactome&quot;    
+## [6] &quot;smpdb&quot;        &quot;wikipathways&quot;</code></pre>
 <p>Note the <code>databases</code> argument is case sensitive so make sure to pass <code>&quot;reactome&quot;</code> and not <code>&quot;Reactome&quot;</code>.</p>
 <p>The <code>cluster</code> argument controls whether or not clustering is used when estimating the adjacency matrix. The default behavior is to use clustering if <code>p &gt; 2,500</code>. However, the user can override this behavior by setting the <code>cluster</code> argument. <code>prepareAdjMat</code> chooses the best clustering method from 6 possible methods in the <code>igraph</code> package. More details are provided in <code>?prepareAdjMat</code>.</p>
 <p>User specified edge and non-edge files are specified with the <code>file_e</code> and <code>file_ne</code> arguments respectively. For more information on the assumptions and how network information is incorporated from the database edgelists, the user edges, and the user non-edges see the Details section and <code>file_e</code> and <code>file_ne</code> parameters in <code>?prepareAdjMat</code>.</p>
