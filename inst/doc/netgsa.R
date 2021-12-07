@@ -6,7 +6,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(netgsa)
 library(graphite)
 library(data.table)
-data("breastcancer2012_subset")
+data("breastcancer2012")
 ls()
 
 ## -----------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-2de2f474d170c619d89e1d34c7d3ea45 *DESCRIPTION
+49f21a223ea9dfaf1d3cc13f73ffaafc *DESCRIPTION
 6e3766e8f9d0a17a54c31801da5dfcff *NAMESPACE
 298066f9750e84cd23647f745903f841 *NEWS.md
 353793cf50460a4ffb3f8775e15648b5 *R/NetGSA.R
@@ -21,19 +21,19 @@ cde642e9fb5dbcb3b0437c2214b0227f *R/netgsa.onesample.R
 2aeeb56c68040fc9c5b5ebeada79975f *R/netgsa.ttest.R
 25fb2df43ebbad61bcd1fcb65ed1dd77 *R/newton.R
 864c9abaf70457df2df4f92c97d5acea *R/normalizeAdj.R
-8cbd86a86b3528b9b381ae6bbe7acf2d *R/obtainEdgeList.R
+2bbbd56e925ee521547c607784d1d7d0 *R/obtainEdgeList.R
 a709f7ec3433fe656263e9b5f957a18b *R/plot.NetGSA.R
 6ab46a3a85ad4d34848c9b46abe1a518 *R/prepareAdjMat.R
 c09fcb5a8802a5fa6f1ff4e0c23283d8 *R/preparePathways.R
 30b8654a3c31085bd9fce6b1ad5b041a *R/profile.newton.se.R
 57494c38a760fee705c0336bad365c57 *R/zeroInd.R
 b347be04da8ef09a3323e2834f0f86b3 *README.md
-866ceeae3871c2c2351e56e72c64d51c *build/partial.rdb
+7a29affdb878b1c65ade04698516e33c *build/partial.rdb
 3b44282a14fb71a382312c2d52bb7cea *build/vignette.rds
 a51792ef269dfff8e09ef103a43b4f87 *data/breastcancer2012_subset.rda
-dc634933af4e2de248f542237375a7a1 *inst/doc/netgsa.R
-19b8a6f2777d42fc88a30169a3b2f8c4 *inst/doc/netgsa.Rmd
-badf96bef30076e3fee7eff46cd18ea2 *inst/doc/netgsa.html
+4b2e5108ca9b3a23e7771ead1add361a *inst/doc/netgsa.R
+6efe36800e7f9c6e3a767afee8c07ffd *inst/doc/netgsa.Rmd
+ff4405f0ed7d0ca5f7cffc6fcb319acd *inst/doc/netgsa.html
 de3dc0c78c156cd07163eb3d48326521 *man/NetGSA.Rd
 28174aabf0f354c40fb56f5e0874f598 *man/NetGSAq.Rd
 497529709bf069fdcf7e9dbc7beb55d7 *man/bic.netEst.undir.Rd
@@ -67,5 +67,5 @@ bd30e16128f2283dbd011f472a3fa863 *vignettes/bibli.bib
 67bbdd557589ce796d40190b3812b6f4 *vignettes/igraph_erbb.png
 2a5732b977b3de7c0de8de1fa0f8b680 *vignettes/igraph_legend.png
 c84bc052743c78bf7dd2c6eb35126167 *vignettes/igraph_pathway_network_default.png
-19b8a6f2777d42fc88a30169a3b2f8c4 *vignettes/netgsa.Rmd
+6efe36800e7f9c6e3a767afee8c07ffd *vignettes/netgsa.Rmd
 dad81e70183002b80b04ef5f2ef5be66 *vignettes/nonedgelist.txt

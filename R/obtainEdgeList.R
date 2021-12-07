@@ -222,7 +222,7 @@ obtainEdgeList <- function(genes, databases){
   NDEx_query_subnetwork <- function(ndex_network_id, ndexcon, search_names, genes){
     src <- i.n <- dest <- . <- NULL #To get rid of data.table package build notes
     query <- jsonlite::toJSON(list(searchString = paste(search_names, collapse = " ")), auto_unbox = TRUE)
-    ## Removed below for R pacakge because ::: not allowed. See github for implementation
+    ## Removed below code to get "response" for R package because ::: not allowed. See github for implementation
     response <- NULL
     
     #Get nodelist/edgelist from query
