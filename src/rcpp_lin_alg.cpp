@@ -6,7 +6,7 @@ using Eigen::Map; using Eigen::MatrixXd; using Eigen::Lower; using Eigen::Upper;
 
 // [[Rcpp::export]]
 SEXP crossprodCpp(SEXP A, SEXP B = R_NilValue){
-  if ( (TYPEOF(A) != REALSXP) | ( (!Rf_isNull(B)) & (TYPEOF(B) != REALSXP) )) {
+  if ( (TYPEOF(A) != REALSXP) || ( (!Rf_isNull(B)) && (TYPEOF(B) != REALSXP) )) {
     Rcpp::stop("Non-numeric matrix detected. Please convert integer/strings to numeric");
   }
     const Map<MatrixXd> AA(Rcpp::as<Map<MatrixXd> >(A));
@@ -27,7 +27,7 @@ SEXP crossprodCpp(SEXP A, SEXP B = R_NilValue){
 
 // [[Rcpp::export]]
 SEXP matMult( SEXP A, SEXP B){
-  if ( (TYPEOF(A) != REALSXP) | (TYPEOF(B) != REALSXP) ) {
+  if ( (TYPEOF(A) != REALSXP) || (TYPEOF(B) != REALSXP) ) {
     Rcpp::stop("Non-numeric matrix detected. Please convert integer/strings to numeric");
   }
     const Map<MatrixXd> AA(Rcpp::as<Map<MatrixXd> >(A));
@@ -45,7 +45,7 @@ SEXP matMult( SEXP A, SEXP B){
 //https://eigen.tuxfamily.org/dox/group__TutorialLinearAlgebra.html
 // [[Rcpp::export]]
 SEXP solveCpp( SEXP A, SEXP B = R_NilValue){
-  if ( (TYPEOF(A) != REALSXP) | ( (!Rf_isNull(B)) & (TYPEOF(B) != REALSXP) )) {
+  if ( (TYPEOF(A) != REALSXP) || ( (!Rf_isNull(B)) && (TYPEOF(B) != REALSXP) )) {
     Rcpp::stop("Non-numeric matrix detected. Please convert integer/strings to numeric");
   }
     const Map<MatrixXd> AA(Rcpp::as<Map<MatrixXd> >(A));
