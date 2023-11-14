@@ -27,5 +27,3 @@ The most recent implementation has optimized the NetGSA computation in the follo
 ## **References**
 **Ma, Jing, Shojaie, Ali and Michailidis, George.** (2016) Network-based pathway enrichment analysis with incomplete network information. Bioinformatics https://doi.org/10.1093/bioinformatics/btw410
 
-
-  [![Travis-CI Build Status](https://travis-ci.org/drjingma/netgsa.svg?branch=master)](https://travis-ci.org/drjingma/netgsa)

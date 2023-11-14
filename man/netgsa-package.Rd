@@ -4,16 +4,7 @@
 \docType{package}
 \title{Network-Based Gene Set Analysis}
 \description{The netgsa-package provides functions for carrying out Network-based Gene Set Analysis by incorporating external information about interactions among genes, as well as novel interactions learned from data.}
-\details{
-\tabular{ll}{
-Package: \tab netgsa\cr
-Type: \tab Package\cr
-Version: \tab 3.1.0\cr
-Date: \tab 2019-03-12\cr
-License: \tab GPL (>=2)\cr
-}
-}
-\author{Ali Shojaie <ashojaie@uw.edu> and Jing Ma <jingma@fredhutch.org>}
+\author{Ali Shojaie <ashojaie@uw.edu>, Jing Ma, Michael Hellstern <mikeh1@uw.edu>m and Kun Yue}
 \references{
 Ma, J., Shojaie, A. & Michailidis, G. (2016) Network-based pathway enrichment analysis with incomplete network information. Bioinformatics 32(20):165--3174. \doi{10.1093/bioinformatics/btw410}
 

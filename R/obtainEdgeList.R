@@ -191,62 +191,63 @@ obtainEdgeList <- function(genes, databases){
     
   }
   
+## Removed code for compatibility with CRAN
 #Add NDEx information
   #Does not do any conversion of genes
   #Assumes all edges are undirected
   #Only searches public
-  addNDEx <- function(edgelist, genes){
-    externalId <- NULL
-    ndexcon = ndexr::ndex_connect()
-    #Find NDEx networks that have any of our genes as nodeNames. Only option appears to be string search in nodeNames 
-    #(e.g. if gene is "38" this will match a nodeName of "3801" in NDEx). Also NDEx is by default an OR search, e.g.
-    #if searchString="nodeName:38 nodeName:401" it will find networks that have partial matches in 38 OR 401
-    #Do this in batches of genes since error if do all at once. Get unique network ids. This will be unique networks
-    #that have a partial match to ANY of our genes of interest
-    search_names <- paste0("nodeName:",genes)
-    found_dbs <- lapply(split(search_names, 1:length(search_names) %/% 200), function(search_vec){
-      return(ndexr::ndex_find_networks(ndexcon, searchString=paste0(search_vec, collapse = " "), size=-1))
-    })
-    all_found_dbs <- rbindlist(found_dbs, use.names = TRUE)
-    unique_ids <- unique(all_found_dbs[,externalId])
-    
-    #Query subnetwork to get only genes of interest. Again this is partial search so will need to cut this down
-    NDEx_edges <- rbindlist(lapply(unique_ids, function(id) NDEx_query_subnetwork(id, ndexcon=ndexcon, search_names=search_names, genes=genes)), 
-                            use.names = TRUE)
-    #Add to full_edgelist
-    edgelist_w_ndex <- rbindlist(list(edgelist, NDEx_edges), use.names=TRUE)
-    
-    return(edgelist_w_ndex)
-  }
-  
-  NDEx_query_subnetwork <- function(ndex_network_id, ndexcon, search_names, genes){
-    src <- i.n <- dest <- . <- NULL #To get rid of data.table package build notes
-    query <- jsonlite::toJSON(list(searchString = paste(search_names, collapse = " ")), auto_unbox = TRUE)
-    ## Removed below code to get "response" for R package because ::: not allowed. See github for implementation
-    response <- NULL
-    
-    #Get nodelist/edgelist from query
-    node_dt <- as.data.table(response$nodes[[4]])
-    edge_dt <- as.data.table(response$edges[[3]])
-    
-    if(nrow(node_dt)==0 | nrow(edge_dt) == 0) {return(NULL)}
-    
-    edge_mapped <- edge_dt[node_dt, on=c(s="@id"), src := i.n][node_dt, on=c(t="@id"), dest := i.n]
-    #Keep only edges we're interested in
-    edge_subs <- edge_mapped[((src %in% genes) & (dest %in% genes))]
-    #Remove self-edges
-    edge_subs <- edge_subs[src != dest]
-    
-    
-    if(nrow(edge_subs) == 0){return(NULL)}
-    
-    #Format for stacking with full edgelist
-    edge_format <- edge_subs[,.(database = paste0("ndex_", ndex_network_id), 
-                                src, src_type = names(genes)[match(src, genes)], 
-                                dest, dest_type = names(genes)[match(dest, genes)], 
-                                direction = "undirected")]
-    return(edge_format)
-  }
+  # addNDEx <- function(edgelist, genes){
+  #   externalId <- NULL
+  #   ndexcon = ndexr::ndex_connect()
+  #   #Find NDEx networks that have any of our genes as nodeNames. Only option appears to be string search in nodeNames 
+  #   #(e.g. if gene is "38" this will match a nodeName of "3801" in NDEx). Also NDEx is by default an OR search, e.g.
+  #   #if searchString="nodeName:38 nodeName:401" it will find networks that have partial matches in 38 OR 401
+  #   #Do this in batches of genes since error if do all at once. Get unique network ids. This will be unique networks
+  #   #that have a partial match to ANY of our genes of interest
+  #   search_names <- paste0("nodeName:",genes)
+  #   found_dbs <- lapply(split(search_names, 1:length(search_names) %/% 200), function(search_vec){
+  #     return(ndexr::ndex_find_networks(ndexcon, searchString=paste0(search_vec, collapse = " "), size=-1))
+  #   })
+  #   all_found_dbs <- rbindlist(found_dbs, use.names = TRUE)
+  #   unique_ids <- unique(all_found_dbs[,externalId])
+  #   
+  #   #Query subnetwork to get only genes of interest. Again this is partial search so will need to cut this down
+  #   NDEx_edges <- rbindlist(lapply(unique_ids, function(id) NDEx_query_subnetwork(id, ndexcon=ndexcon, search_names=search_names, genes=genes)), 
+  #                           use.names = TRUE)
+  #   #Add to full_edgelist
+  #   edgelist_w_ndex <- rbindlist(list(edgelist, NDEx_edges), use.names=TRUE)
+  #   
+  #   return(edgelist_w_ndex)
+  # }
+  # 
+  # NDEx_query_subnetwork <- function(ndex_network_id, ndexcon, search_names, genes){
+  #   src <- i.n <- dest <- . <- NULL #To get rid of data.table package build notes
+  #   query <- jsonlite::toJSON(list(searchString = paste(search_names, collapse = " ")), auto_unbox = TRUE)
+  #   ## Removed below code to get "response" for R package because ::: not allowed. See github for implementation
+  #   response <- NULL
+  #   
+  #   #Get nodelist/edgelist from query
+  #   node_dt <- as.data.table(response$nodes[[4]])
+  #   edge_dt <- as.data.table(response$edges[[3]])
+  #   
+  #   if(nrow(node_dt)==0 | nrow(edge_dt) == 0) {return(NULL)}
+  #   
+  #   edge_mapped <- edge_dt[node_dt, on=c(s="@id"), src := i.n][node_dt, on=c(t="@id"), dest := i.n]
+  #   #Keep only edges we're interested in
+  #   edge_subs <- edge_mapped[((src %in% genes) & (dest %in% genes))]
+  #   #Remove self-edges
+  #   edge_subs <- edge_subs[src != dest]
+  #   
+  #   
+  #   if(nrow(edge_subs) == 0){return(NULL)}
+  #   
+  #   #Format for stacking with full edgelist
+  #   edge_format <- edge_subs[,.(database = paste0("ndex_", ndex_network_id), 
+  #                               src, src_type = names(genes)[match(src, genes)], 
+  #                               dest, dest_type = names(genes)[match(dest, genes)], 
+  #                               direction = "undirected")]
+  #   return(edge_format)
+  # }
 
 
 
