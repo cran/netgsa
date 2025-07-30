@@ -53,7 +53,7 @@ Jing Ma & Michael Hellstern
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-\code{\link{prepareAdjMat}}, \code{\link{bic.netEst.undir}}, \code{\link{glmnet}}
+\code{\link{prepareAdjMat}}, \code{\link{bic.netEst.undir}}, \code{\link[glmnet]{glmnet}}
 }
 \examples{
 library(glassoFast)

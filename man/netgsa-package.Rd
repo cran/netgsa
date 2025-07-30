@@ -17,5 +17,5 @@ Shojaie, A., & Michailidis, G. (2009). Analysis of gene sets based on the underl
 \keyword{ package }
 
 \seealso{
-\code{\link{glmnet}}
+\code{\link[glmnet]{glmnet}}
 }

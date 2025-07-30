@@ -1,3 +1,6 @@
+# netgsa 4.0.6
+- Added missing package anchors in Rd links
+
 # netgsa 4.0.5
 - Removed inconsistent metadata in package overview help file
 - Removed ndexr from suggests and jsonlite from imports. Also removed relevant code as it's only available in development version of GitHub

@@ -50,6 +50,6 @@ Ali Shojaie
 }
 
 \seealso{
-\code{\link{prepareAdjMat}}, \code{\link{glmnet}}
+\code{\link{prepareAdjMat}}, \code{\link[glmnet]{glmnet}}
 }
 
