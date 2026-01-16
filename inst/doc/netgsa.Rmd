@@ -1,5 +1,5 @@
 ---
-title: 'netgsa: Network-based Gene Set Analysis'
+title: 'Introduction to netgsa'
 author: "Jing Ma, Michael Hellstern"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -52,10 +52,13 @@ The objects loaded which are necessary for this vignette are:
 
 The data matrix, `x` must have rownames that are named as  `"GENE_ID:GENE_VALUE"`. Since  `netgsa`  allows the user to search for edges in multiple databases in `graphite`, each of which may use different identifiers (e.g. KEGG, Reactome, Biocarta, etc.), `netgsa` needs to know the identifier for a given gene so we can convert it properly. For example, if you have two genes "ENTREZID: 7186" and "ENTREZID: 329" and want to search for potential edges between these two within Reactome,  `netgsa` must first convert these genes to their "UNIPROT" IDs and use those to search for edges.
 
-`netgsa` uses the  `AnnotationDbi`  package to convert genes. The valid list of  `"GENE_ID"`'s is:
+`netgsa` uses the  `AnnotationDbi`  package to convert genes if the user has the `org.Hs.eg.db` package installed. The valid list of  `"GENE_ID"`'s is:
 ```{r}
-AnnotationDbi::keytypes(org.Hs.eg.db::org.Hs.eg.db)
+if (requireNamespace("org.Hs.eg.db", quietly = TRUE)){
+ AnnotationDbi::keytypes(org.Hs.eg.db::org.Hs.eg.db) 
+}
 ```
+If `org.Hs.eg.db` is not installed, GENE_ID conversion and validation will be skipped and only the exact genes/IDs passed `obtainEdgeList` will be used to search for interactions in the specified databases. The `org.Hs.eg.db` package can be installed from Bioconductor.
 
 <!-- For metabolites, `netgsa` uses `graphite`'s built in metabolite mapping. These are: -->
 <!-- ```{r} -->

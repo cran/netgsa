@@ -10,7 +10,9 @@ data("breastcancer2012_subset")
 ls()
 
 ## -----------------------------------------------------------------------------
-AnnotationDbi::keytypes(org.Hs.eg.db::org.Hs.eg.db)
+if (requireNamespace("org.Hs.eg.db", quietly = TRUE)){
+ AnnotationDbi::keytypes(org.Hs.eg.db::org.Hs.eg.db) 
+}
 
 ## -----------------------------------------------------------------------------
 head(rownames(x))

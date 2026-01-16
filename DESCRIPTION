@@ -1,8 +1,8 @@
 Package: netgsa
 Type: Package
 Title: Network-Based Gene Set Analysis
-Version: 4.0.6
-Date: 2025-07-30
+Version: 4.0.7
+Date: 2026-01-13
 Authors@R: c(
     person("Michael", "Hellstern", email = "mikeh1@uw.edu", role = c("aut","cre")),
     person("Ali", "Shojaie", email = "ashojaie@uw.edu", role = c("aut")),
@@ -13,22 +13,21 @@ Depends: R (>= 3.5.0)
 biocViews:
 Imports: AnnotationDbi, corpcor, data.table, dplyr, genefilter, graph,
         graphite, glmnet, glassoFast, httr, igraph, magrittr, Matrix,
-        msigdbr, org.Hs.eg.db, quadprog, RCy3, reshape2, rlang, Rcpp
-        (>= 1.0.2)
-Suggests: knitr, MASS, rmarkdown
+        msigdbr, quadprog, RCy3, reshape2, rlang, Rcpp (>= 1.0.2)
+Suggests: knitr, MASS, org.Hs.eg.db, rmarkdown
 License: GPL (>= 3)
 LinkingTo: Rcpp, RcppEigen
 LazyLoad: yes
 LazyData: true
 VignetteBuilder: knitr
 URL: https://github.com/mikehellstern/netgsa
-RoxygenNote: 7.1.1
+RoxygenNote: 7.3.1
 NeedsCompilation: yes
-Packaged: 2025-07-30 19:26:35 UTC; mike
+Packaged: 2026-01-14 02:47:57 UTC; mike
 Author: Michael Hellstern [aut, cre],
   Ali Shojaie [aut],
   Jing Ma [aut],
   Kun Yue [aut]
 Maintainer: Michael Hellstern <mikeh1@uw.edu>
 Repository: CRAN
-Date/Publication: 2025-07-30 20:50:02 UTC
+Date/Publication: 2026-01-16 01:10:02 UTC

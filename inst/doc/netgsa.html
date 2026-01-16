@@ -12,9 +12,9 @@
 
 <meta name="author" content="Jing Ma, Michael Hellstern" />
 
-<meta name="date" content="2025-07-30" />
+<meta name="date" content="2026-01-13" />
 
-<title>netgsa: Network-based Gene Set Analysis</title>
+<title>Introduction to netgsa</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -50,8 +50,9 @@ overflow: visible;
 }
 </style>
 <style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -62,7 +63,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
 { counter-reset: source-line 0; }
@@ -150,7 +151,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; }
 div.csl-bib-body { }
 div.csl-entry {
 clear: both;
-margin-bottom: 0em;
 }
 .hanging div.csl-entry {
 margin-left:2em;
@@ -361,10 +361,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">netgsa: Network-based Gene Set
-Analysis</h1>
+<h1 class="title toc-ignore">Introduction to netgsa</h1>
 <h4 class="author">Jing Ma, Michael Hellstern</h4>
-<h4 class="date">2025-07-30</h4>
+<h4 class="date">2026-01-13</h4>
 
 
 
@@ -375,7 +374,7 @@ of the breast cancer data example downloaded from the Cancer Genome
 Atlas <span class="citation">(TCGA 2012)</span>. In particular, we
 illustrate how to incorporate existing network information (e.g. curated
 edges from KEGG) to improve the power of pathway enrichment analysis
-with NetGSA. Details of the method are avaialble in <span class="citation">Ma, Shojaie, and Michailidis (2016)</span>.</p>
+with NetGSA. Details of the method are avaialble in <span class="citation">Ma et al. (2016)</span>.</p>
 <p><code>netgsa</code> provides simple functions that automatically
 search known gene databases using <code>graphite</code> for network
 information and integrate seamlessly with <code>NetGSA</code> pathway
@@ -433,8 +432,11 @@ potential edges between these two within Reactome, <code>netgsa</code>
 must first convert these genes to their “UNIPROT” IDs and use those to
 search for edges.</p>
 <p><code>netgsa</code> uses the <code>AnnotationDbi</code> package to
-convert genes. The valid list of <code>&quot;GENE_ID&quot;</code>’s is:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>AnnotationDbi<span class="sc">::</span><span class="fu">keytypes</span>(org.Hs.eg.db<span class="sc">::</span>org.Hs.eg.db)</span></code></pre></div>
+convert genes if the user has the <code>org.Hs.eg.db</code> package
+installed. The valid list of <code>&quot;GENE_ID&quot;</code>’s is:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">requireNamespace</span>(<span class="st">&quot;org.Hs.eg.db&quot;</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)){</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a> AnnotationDbi<span class="sc">::</span><span class="fu">keytypes</span>(org.Hs.eg.db<span class="sc">::</span>org.Hs.eg.db) </span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>}</span></code></pre></div>
 <pre><code>## </code></pre>
 <pre><code>##  [1] &quot;ACCNUM&quot;       &quot;ALIAS&quot;        &quot;ENSEMBL&quot;      &quot;ENSEMBLPROT&quot;  &quot;ENSEMBLTRANS&quot;
 ##  [6] &quot;ENTREZID&quot;     &quot;ENZYME&quot;       &quot;EVIDENCE&quot;     &quot;EVIDENCEALL&quot;  &quot;GENENAME&quot;    
@@ -442,6 +444,11 @@ convert genes. The valid list of <code>&quot;GENE_ID&quot;</code>’s is:</p>
 ## [16] &quot;OMIM&quot;         &quot;ONTOLOGY&quot;     &quot;ONTOLOGYALL&quot;  &quot;PATH&quot;         &quot;PFAM&quot;        
 ## [21] &quot;PMID&quot;         &quot;PROSITE&quot;      &quot;REFSEQ&quot;       &quot;SYMBOL&quot;       &quot;UCSCKG&quot;      
 ## [26] &quot;UNIPROT&quot;</code></pre>
+<p>If <code>org.Hs.eg.db</code> is not installed, GENE_ID conversion and
+validation will be skipped and only the exact genes/IDs passed
+<code>obtainEdgeList</code> will be used to search for interactions in
+the specified databases. The <code>org.Hs.eg.db</code> package can be
+installed from Bioconductor.</p>
 <!-- For metabolites, `netgsa` uses `graphite`'s built in metabolite mapping. These are: -->
 <!-- ```{r} -->
 <!-- colnames(graphite:::metabolites()) -->
@@ -770,7 +777,7 @@ the gene interactions within a pathway:</p>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="unnumbered">References</h2>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-kanehisa2000kegg" class="csl-entry">
 Kanehisa, Minoru, and Susumu Goto. 2000. <span>“KEGG: Kyoto Encyclopedia
 of Genes and Genomes.”</span> <em>Nucleic Acids Research</em> 28 (1):

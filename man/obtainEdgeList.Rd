@@ -5,11 +5,12 @@
 Find all edges between genes in the specified graphite databases.
 }
 \usage{
-obtainEdgeList(genes, databases)
+obtainEdgeList(genes, databases, verbose = TRUE)
 }
 \arguments{
   \item{genes}{Character vector of gene ID and gene value. The ID and gene value should be separated by a colon. E.g. "ENTREZID:127550". It is very important to have these separated by a colon since \code{obtainEdgeList} uses regular expressions to split this into gene value and gene ID.}
   \item{databases}{Character vector of graphite databases you wish to search for edges. Options are: biocarta, kegg, nci, panther, pathbank, pharmgkb, reactome, smpdb, ndex. Note NDEx is recommended for expert users and is only available for the development version of netgsa (https://github.com/mikehellstern/netgsa), see details.}
+  \item{verbose}{Boolean. To disable warning messages use \code{TRUE}.}
 }
 \details{
 \code{obtainEdgeList} searches through the specified databases to find edges between genes in the \code{genes} argument. Since one can search in multiple databases with different identifiers, genes are converted using \code{AnnotationDbi::select} and metabolites are converted using \code{graphite:::metabolites()}. Databases are also used to specify non-edges. This function searches through \code{graphite} databases and also has the option to search NDEx (public databases only). However, since NDEx is open-source and does not contain curated edge information like \code{graphite}, NDEx database search is a beta function and is only recommended for expert users. When searching through NDEx, gene identifiers are not converted. Only, the gene identifiers passed to the \code{genes} argument are used to search through NDEx. NDEx contains some very large networks with millions of edges and extracting those of interest can be slow.

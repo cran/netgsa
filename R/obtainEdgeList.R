@@ -1,32 +1,42 @@
-obtainEdgeList <- function(genes, databases){
+obtainEdgeList <- function(genes, databases, verbose = TRUE){
   conversion_type <- . <- converted_gene <- converted_id <- direction <- dest <- dest_type <- src <- src_type <- base_gene_dest <- base_id_dest <- base_gene_src <- base_id_src <- database <- NULL #Added to avoid data.table note in R CMD check
   genes <- setNames(gsub(".*:(.*)", "\\1", genes), gsub("(.*):.*", "\\1", genes))
 
   ## Remove metabolites IDs because cant use ":::" in CRAN. See github for implementation
   metabolites_ids   <- NULL
-  genes_with_id     <- reshapeIDs(genes, metabolites_ids)
+  has_org <- requireNamespace("org.Hs.eg.db", quietly = TRUE)
+  genes_with_id     <- reshapeIDs(genes, metabolites_ids, has_org)
   
   # Creating database here so we only need to process once. Also doing after genes_with_id since this takes the longest. Want to fail as early as possible
   full_edgelist     <- stackDatabases(setdiff(databases, "ndex"))
   #NDEx is special, add it if desired
   if("ndex" %in% databases) { message("NDEx is only available in the development version of netgsa: https://github.com/mikehellstern/netgsa")}#full_edgelist     <- addNDEx(full_edgelist, genes)}
   
-  # Obtaining unique ids used by all chosen databases. We will convert to these IDs.
-  # E.g. if databases only use "ENTREZID", "CHEBI", and "UNIPROT", this return a list of list(org.Hs.eg.db = c("ENTREZID", "UNIPROT"), metabolites = "CHEBI")
-  databases_ids     <- findDatabaseIDs(full_edgelist, metabolites_ids)
-  
-  # Convert proteins
-  ids_to_convert_using_orgHsegdb <- genes_with_id[conversion_type == "org.Hs.eg.db"]
-  spl_ids                        <- split(ids_to_convert_using_orgHsegdb, ids_to_convert_using_orgHsegdb[["id_type"]])
-  converted_proteins             <- rbindlist(lapply(spl_ids, convertProteinGroups, databases_ids[["org.Hs.eg.db"]]), use.names = TRUE)
-  
-  # Convert metabolites
-  metabs_ids            <- genes_with_id[conversion_type == "graphite_metabolites"]
-  converted_metabolites <- if(nrow(metabs_ids) == 0) NULL
-                           else                      rbindlist(Map(convert_single_metabolite, metabs_ids[["id_type"]], metabs_ids[["gene"]], list(databases_ids[["metabolites"]]), list(metabolites_ids)), use.names = TRUE)
-  
-  # All finalized_ids should be character
-  finalized_ids <- rbindlist(list(converted_proteins, converted_metabolites), use.names = TRUE, fill = TRUE)
+  if(has_org){
+    # Obtaining unique ids used by all chosen databases. We will convert to these IDs.
+    # E.g. if databases only use "ENTREZID", "CHEBI", and "UNIPROT", this return a list of list(org.Hs.eg.db = c("ENTREZID", "UNIPROT"), metabolites = "CHEBI")
+    databases_ids     <- findDatabaseIDs(full_edgelist, metabolites_ids)
+    
+    # Convert proteins
+    ids_to_convert_using_orgHsegdb <- genes_with_id[conversion_type == "org.Hs.eg.db"]
+    spl_ids                        <- split(ids_to_convert_using_orgHsegdb, ids_to_convert_using_orgHsegdb[["id_type"]])
+    converted_proteins             <- rbindlist(lapply(spl_ids, convertProteinGroups, databases_ids[["org.Hs.eg.db"]]), use.names = TRUE)
+    
+    # Convert metabolites
+    metabs_ids            <- genes_with_id[conversion_type == "graphite_metabolites"]
+    converted_metabolites <- if(nrow(metabs_ids) == 0) NULL
+    else                      rbindlist(Map(convert_single_metabolite, metabs_ids[["id_type"]], metabs_ids[["gene"]], list(databases_ids[["metabolites"]]), list(metabolites_ids)), use.names = TRUE)
+    
+    # All finalized_ids should be character
+    finalized_ids <- rbindlist(list(converted_proteins, converted_metabolites), use.names = TRUE, fill = TRUE)
+  } else{
+    # if we don't have org.Hs.eg.db we can't do conversion so fill with gene name/id. Duplicated these columns for consistency with finalized_ids
+    finalized_ids <- data.table(base_gene = genes_with_id$gene, base_id = genes_with_id$id_type, converted_gene = genes_with_id$gene, converted_id = genes_with_id$id_type)
+    if (verbose){
+      warning("org.Hs.eg.db package not detected; skipping gene conversion. Only identifiers in 'genes' will be used. To enable conversion, install 'org.Hs.eg.db' from Bioconductor.. To turn off this message use `verbose = FALSE`.")
+    }
+  }
+
 
   #Merge twice separately
   src_subs             <- setnames(full_edgelist[finalized_ids, on = .(src = converted_gene,  src_type  = converted_id), nomatch = 0L], c("base_gene", "base_id"), c("base_gene_src",  "base_id_src"))
@@ -66,24 +76,29 @@ obtainEdgeList <- function(genes, databases){
 
 
 # Reshape IDs into format that's easier to merge onto database
-  reshapeIDs <- function(genes, metabolites){
+  reshapeIDs <- function(genes, metabolites, has_org){
     
     # Make sure all genes have names
     if(is.null(names(genes)) | any(names(genes) == "")) stop("Please select identfier type of all genes. You can do this by setting the name of each element to the identifier type of that gene")
     
-    # Make sure their gene is gene type we know about
-    unconv_ids <- !names(genes) %in% c(names(metabolites), AnnotationDbi::keytypes(org.Hs.eg.db::org.Hs.eg.db))
+    # conditonally use org.Hs.eg.db if available
+    if(has_org){
+      # Make sure their gene is gene type we know about
+      unconv_ids <- !names(genes) %in% c(names(metabolites), AnnotationDbi::keytypes(org.Hs.eg.db::org.Hs.eg.db))
+      
+      if(any(unconv_ids)) stop(paste0(paste0("Don't know how to convert ID type(s): ", paste(names(genes)[unconv_ids], collapse = ", ")), 
+                                             ". Please use ID type from AnnotationDbi::keytypes(org.Hs.eg.db::org.Hs.eg.db)."))
+      
     
-    if(any(unconv_ids)) stop(paste0(paste0("Don't know how to convert ID type(s): ", paste(names(genes)[unconv_ids], collapse = ", ")), 
-                                           ". Please use ID type from AnnotationDbi::keytypes(org.Hs.eg.db::org.Hs.eg.db)."))
-    
-  
-    
-    # All ID types are valid, drop duped IDs and make sure actual genes are valid for specific ID type
-    genes_cl <- checkIDs(genes, metabolites)
-    conversion_type = ifelse(names(genes_cl) %in% names(metabolites),                                    "graphite_metabolites",
-                      ifelse(names(genes_cl) %in% AnnotationDbi::keytypes(org.Hs.eg.db::org.Hs.eg.db),   "org.Hs.eg.db", NA))
-    
+      
+      # All ID types are valid, drop duped IDs and make sure actual genes are valid for specific ID type
+      genes_cl <- checkIDs(genes, metabolites)
+      conversion_type = ifelse(names(genes_cl) %in% names(metabolites),                                    "graphite_metabolites",
+                        ifelse(names(genes_cl) %in% AnnotationDbi::keytypes(org.Hs.eg.db::org.Hs.eg.db),   "org.Hs.eg.db", NA))
+    } else{
+      genes_cl <- genes
+      conversion_type = NA
+    }
     data.table(id_type = names(genes_cl), gene = genes_cl, conversion_type = conversion_type)
     
   }

@@ -1,4 +1,4 @@
-947e1b99ad2ab44ef39b54e274faadb3 *DESCRIPTION
+4847b6e15f8fc79e07b132413df7ecc5 *DESCRIPTION
 6e3766e8f9d0a17a54c31801da5dfcff *NAMESPACE
 0e596490f6d9224c8745f64e9d384ea0 *NEWS.md
 353793cf50460a4ffb3f8775e15648b5 *R/NetGSA.R
@@ -21,7 +21,7 @@ cde642e9fb5dbcb3b0437c2214b0227f *R/netgsa.onesample.R
 2aeeb56c68040fc9c5b5ebeada79975f *R/netgsa.ttest.R
 25fb2df43ebbad61bcd1fcb65ed1dd77 *R/newton.R
 864c9abaf70457df2df4f92c97d5acea *R/normalizeAdj.R
-9d5451a237163fd335f246ac74493562 *R/obtainEdgeList.R
+fd424e54473125f065854eff18243b37 *R/obtainEdgeList.R
 a709f7ec3433fe656263e9b5f957a18b *R/plot.NetGSA.R
 6ab46a3a85ad4d34848c9b46abe1a518 *R/prepareAdjMat.R
 c09fcb5a8802a5fa6f1ff4e0c23283d8 *R/preparePathways.R
@@ -31,9 +31,9 @@ e018470519d9b9705692652e8b0adb56 *README.md
 aa5e5a2cbfaea3d9b6cdbe378ac48cee *build/partial.rdb
 bd0437f13da6d1a734c624ccfb58a17e *build/vignette.rds
 a51792ef269dfff8e09ef103a43b4f87 *data/breastcancer2012_subset.rda
-39c89c23279df2e7766f9116d6c19bb7 *inst/doc/netgsa.R
-19b8a6f2777d42fc88a30169a3b2f8c4 *inst/doc/netgsa.Rmd
-0b4f6f112092f8c5cc0783c2395575ab *inst/doc/netgsa.html
+508e5fdef1f5a088ddc5134615ef8cf0 *inst/doc/netgsa.R
+77aeeaac6e2afbee2fcb3284e23b84de *inst/doc/netgsa.Rmd
+b0571c23e98ac3ff271a1576ae7be4d9 *inst/doc/netgsa.html
 de3dc0c78c156cd07163eb3d48326521 *man/NetGSA.Rd
 28174aabf0f354c40fb56f5e0874f598 *man/NetGSAq.Rd
 497529709bf069fdcf7e9dbc7beb55d7 *man/bic.netEst.undir.Rd
@@ -46,7 +46,7 @@ ff2f56e5449e3c9970fed4fb2ff52149 *man/netEst.undir.Rd
 113a58ad345b1410f731096f2a04278a *man/netgsa-package.Rd
 360e1217c94364cb2b7a69c6098a10f2 *man/nonedgelist.Rd
 a394b4f7d0bcd210fd3b3763f57c1df0 *man/obtainClusters.Rd
-95f28f519f55976f4aa52c035aa1bef5 *man/obtainEdgeList.Rd
+c5c59c8606cf6716027404281265aa9c *man/obtainEdgeList.Rd
 22fe3b61619e60ce7487b94976e73b40 *man/pathways.Rd
 7edcf94e6829be53f84eb2782c3d9039 *man/pathways_mat.Rd
 ff70ab85749336f6d7c8460cd75e3db3 *man/plot.NetGSA.Rd
@@ -67,5 +67,5 @@ bd30e16128f2283dbd011f472a3fa863 *vignettes/bibli.bib
 67bbdd557589ce796d40190b3812b6f4 *vignettes/igraph_erbb.png
 2a5732b977b3de7c0de8de1fa0f8b680 *vignettes/igraph_legend.png
 c84bc052743c78bf7dd2c6eb35126167 *vignettes/igraph_pathway_network_default.png
-19b8a6f2777d42fc88a30169a3b2f8c4 *vignettes/netgsa.Rmd
+77aeeaac6e2afbee2fcb3284e23b84de *vignettes/netgsa.Rmd
 dad81e70183002b80b04ef5f2ef5be66 *vignettes/nonedgelist.txt
